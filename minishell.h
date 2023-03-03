@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/02 15:21:34 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/03 21:51:02 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 # define OUT 3
 # define SQ '\''
 # define DQ '\"'
+# define CLOSED 0
+# define UNCLOSED 1
 
 typedef struct s_token
 {
@@ -41,4 +43,11 @@ typedef struct s_rd
 	char	*file;
 }	t_rd;
 
-# endif
+typedef enum e_quote
+{
+	F_DQ,
+	F_SQ,
+	F_LT
+}	t_quote;
+
+#endif
