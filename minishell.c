@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/03 19:48:35 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/05 14:57:46 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,78 +104,6 @@ void	add_redirection_struct(t_token *token, char **input)
 			rd->type = OUT;
 	}
 	rd->file = get_txt(input);
-}
-
-int	get_txtidx(char **input)
-{
-	int	i;
-
-	i = 1;
-	if (**input == '\"')
-	{
-		while (*input[i] != '\"')
-			i++;
-		return (i - 1);
-	}
-	if (**input == '\'')
-	{
-		while (*input[i] != '\'')
-			i++;
-		return (i - 1);
-	}
-}
-
-char	*get_txt(char **input)
-{
-	int		i;
-	int		idx;
-	int		size;
-	int		start;
-	char	*txt;
-	char	*env;
-	char	*tmp;
-
-	i = 0;
-	if (**input == ' ' || **input == '\n')
-		(*input)++;
-	if (**input == '\"')
-	{
-		start = i;
-		while (*input[++i] && *input[i] != '\"')
-		{
-			if (*input[i] == '$')
-			{
-				txt = ft_substr(input, i, );
-				i++;
-				idx = 0;
-				while (ft_isalnum(*input[i + idx++]));
-				env = ft_substr(*input, i, idx - 1);
-				if (!env)
-					exit(1);
-				tmp = env;
-				env = getenv(env);
-				free(tmp);
-				(*input) += idx;
-			}
-
-		}
-
-		if (env)
-			size = i - idx + ft_strlen(env);
-		else
-			size = i - idx;
-	}
-	else if (**input == '\'')
-	{
-		while (*input[++i] && *input[i] != '\'');
-		size = i;
-	}
-	else
-	{
-		while (*input[++i] == ' ' || *input[i] == '|');
-		size = i;
-	}
-	return (txt)
 }
 
 void	add_text_struct(t_token *token, char *input, int i)

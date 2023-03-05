@@ -6,21 +6,21 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 12:44:24 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/03 21:51:06 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/05 14:57:34 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 //this function will change and return only literal in double quotation, and increase input pointer
-void	change_double_quote(char **input, int **quote, char *txt)
+char	*get_changed_double_quote(char **input, int **quote, char *txt)
 {
 	int		i;
 	int		start;
 	char	*env;//expanded env
 
 	i = 0;
-	*input++;//start after $
+	(*input)++;//start after $
 	start = i;
 	while (*quote[F_DQ] == UNCLOSED)//it will recur until quotation open
 	{
@@ -42,13 +42,14 @@ void	change_double_quote(char **input, int **quote, char *txt)
 }
 
 //this function will change and return only literal in single quotation
-void	change_single_quote(char **input, int **quote, char *txt)
+char	*get_changed_single_quote(char **input, int **quote, char *txt)
 {
 	int		i;
 	int		start;
 	char	*env;//expanded env
 
 	i = 0;
+	(*input)++;
 	start = i;
 	while (*quote[F_SQ] == UNCLOSED)//it will recur until quotation open
 	{
@@ -62,7 +63,7 @@ void	change_single_quote(char **input, int **quote, char *txt)
 }
 
 //this function will change and return literal to space character
-void	change_string(char **input, int **quote, char *txt)
+char	*get_changed_string(char **input, int **quote, char *txt)
 {
 	int		i;
 	int		start;
@@ -72,7 +73,8 @@ void	change_string(char **input, int **quote, char *txt)
 	start = i;
 	while (**input == ' ')
 		(*input)++;
-	while (*input[i] != ' ' || *input[i] != '\0' || *input[i] != DQ || *input[i] != SQ)//it will recur to end of string.
+	while (*input[i] != ' ' || *input[i] != '\0' || *input[i] != '|' || \
+	*input[i] != DQ || *input[i] != SQ)//it will recur to end of string.
 	{
 		if (*input[i] == '$')//if '$' sign appear, env will be expanded.
 		{
@@ -103,26 +105,26 @@ char	*get_txt(char **input)
 	while (++i < 3)
 		quote[i] = 0;
 	txt = 0;
-	while (**input == ' ' || **input == '\n')
+	while (**input == ' ')
 		(*input)++;
 	while (**input)
 	{
 		if (**input == DQ)
 		{
 			quote[F_DQ] == UNCLOSED;
-			change_double_quote(input, &quote, txt);
+			txt = get_changed_double_quote(input, &quote, txt);
 		}
 		else if (**input == SQ)
 		{
 			quote[F_SQ] == UNCLOSED;
-			change_single_quote(input, &quote, txt);
+			txt = get_changed_single_quote(input, &quote, txt);
 		}
 		else
 		{
 			quote[F_LT] == 1;
-			change_string(input, &quote, txt);
+			txt = get_changed_string(input, &quote, txt);
 		}
-		if (*input[i] == ' ')
+		if (*input[i] == ' ' || *input[i] == '|')
 			break ;
 	}
 	return (txt);
