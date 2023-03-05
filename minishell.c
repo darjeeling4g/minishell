@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/02 18:48:47 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/03 19:48:35 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ int	is_complete_command(char *input)
 	flag = 1;
 	while (input[++i])
 	{
-		if (input[i] == '\"' && flag == 1)
+		if (input[i] == DQ && flag == 1)
 			flag = DQ;
-		else if (input[i] == '\'' && flag == 1)
+		else if (input[i] == SQ && flag == 1)
 			flag = SQ;
-		else if (input[i] == '\"' && flag == DQ)
+		else if (input[i] == DQ && flag == DQ)
 			flag = 1;
-		else if (input[i] == '\'' && flag == SQ)
+		else if (input[i] == SQ && flag == SQ)
 			flag = 1;
 	}
 	return (flag);
@@ -58,7 +58,7 @@ t_list	*tokenizer(char *input)
 {
 	t_list	*res;
 	t_list	*new;
-	t_token	token;
+	t_token	*token;
 
 	while (*input)
 	{
@@ -102,7 +102,7 @@ void	add_redirection_struct(t_token *token, char **input)
 		}
 		else
 			rd->type = OUT;
-	} 
+	}
 	rd->file = get_txt(input);
 }
 
@@ -130,6 +130,8 @@ char	*get_txt(char **input)
 	int		i;
 	int		idx;
 	int		size;
+	int		start;
+	char	*txt;
 	char	*env;
 	char	*tmp;
 
@@ -138,10 +140,12 @@ char	*get_txt(char **input)
 		(*input)++;
 	if (**input == '\"')
 	{
+		start = i;
 		while (*input[++i] && *input[i] != '\"')
 		{
 			if (*input[i] == '$')
 			{
+				txt = ft_substr(input, i, );
 				i++;
 				idx = 0;
 				while (ft_isalnum(*input[i + idx++]));
@@ -153,7 +157,9 @@ char	*get_txt(char **input)
 				free(tmp);
 				(*input) += idx;
 			}
+
 		}
+
 		if (env)
 			size = i - idx + ft_strlen(env);
 		else
@@ -169,7 +175,7 @@ char	*get_txt(char **input)
 		while (*input[++i] == ' ' || *input[i] == '|');
 		size = i;
 	}
-	return (res)
+	return (txt)
 }
 
 void	add_text_struct(t_token *token, char *input, int i)
