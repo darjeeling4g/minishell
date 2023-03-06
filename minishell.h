@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/05 20:07:19 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/06 19:32:43 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_H
 # include <unistd.h>
 # include <sys/errno.h>
+# include <fcntl.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <readline/readline.h>
@@ -66,4 +67,6 @@ char	*get_changed_double_quote(char **input, int *quote, char *txt);
 char	*get_changed_single_quote(char **input, int *quote, char *txt);
 char	*get_changed_string(char **input, char *txt);
 
+//error_handler.
+void	put_error_message(int errno);
 #endif

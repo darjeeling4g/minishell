@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/05 20:17:23 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/06 15:52:41 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,8 +101,11 @@ void	add_text_struct(t_token *token, char **input)
 	char	*txt;
 
 	txt = get_txt(input);
-	new = ft_lstnew(txt);
-	ft_lstadd_back(&token->txt, new);
+	if (txt)
+	{
+		new = ft_lstnew(txt);
+		ft_lstadd_back(&token->txt, new);
+	}
 }
 
 void	add_redirection_struct(t_token *token, char **input)
@@ -151,15 +154,15 @@ int main(void)
 	t_list	*txt;
 	t_rd	*rd;
 
-		input = "<< infile | cat | ls | grep 'print this'| >> outfile";
-//    while ((input = readline("minishell$ ")) != NULL)
-//	{
+//		input = "<< infile | cat | ls | grep \"print this\"string| >> outfile";
+   while ((input = readline("minishell$ ")) != NULL)
+	{
 		flag = is_complete_command(input);
         join_input(&input, flag);
-		// Do something with the user's input
+		// // Do something with the user's input
         p_lst = tokenizer(input);//need to save pointer of the input!!!
 
-		// test!!
+		//test!!
 		while (p_lst)
 		{
 			token = (t_token *)p_lst->content;
@@ -176,13 +179,14 @@ int main(void)
 				printf("txt : %s\n", (char *)txt->content);
 				txt = txt->next;
 			}
+			printf("==========pipe========\n");
 			p_lst = p_lst->next;
-//		}
+		}
 
 		// Add the input to the history
 		add_history(input);
 		// Free the memory allocated by readline()
-//		free(input);
+		free(input);
     }
     return 0;
 }
