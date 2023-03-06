@@ -6,26 +6,33 @@
 #    By: danpark <danpark@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 18:47:25 by danpark           #+#    #+#              #
-#    Updated: 2023/03/02 15:26:24 by danpark          ###   ########.fr        #
+#    Updated: 2023/03/05 17:59:54 by danpark          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS_M = minishell.c
+SRCS_M = minishell.c get_txt.c minishell_utils.c
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
 OBJS_M = ${SRCS_M:.c=.o}
 NAME = minishell
-CPPFLAG = -I libft -I ~/goinfre/.brew/opt/readline/include
-LDFLAG = -L libft -L ~/goinfre/.brew/opt/readline/lib
+CPPFLAGS = -I libft -I ~/goinfre/.brew/opt/readline/include
+LDFLAGS = -L libft -L ~/goinfre/.brew/opt/readline/lib
 LDLIBS = -lft -lreadline
 
 all = $(NAME)
 
 %.o : %.c
-	$(CC) $(CFLAGS) $(CPPFLAG) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(NAME) : $(OBJS_M)
-	make -C libft
-	$(CC) $(CFLAGS) $(LDFLAG) $(LDLIBS) $^ -o $@
+	make bonus -C libft
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
+clean : 
+	$(MAKE) fclean -C libft
+	$(RM) $(OBJS_M)
+
+fclean :
+	$(MAKE) clean
+	$(RM) $(NAME)

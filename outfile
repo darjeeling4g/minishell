@@ -1,0 +1,12 @@
+LICENSE
+Makefile
+get_txt.c
+get_txt.o
+libft
+minishell
+minishell.c
+minishell.h
+minishell.o
+minishell_utils.c
+minishell_utils.o
+outfile

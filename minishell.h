@@ -6,12 +6,14 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/03 21:51:02 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/05 20:07:19 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+# include <unistd.h>
+# include <sys/errno.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <readline/readline.h>
@@ -28,14 +30,9 @@
 
 typedef struct s_token
 {
-	struct s_txt	**txt;
-	struct s_rd		**rd;
+	t_list	*txt;
+	t_list	*rd;
 }	t_token;
-
-typedef struct s_txt
-{
-	char	*str;
-}	t_txt;
 
 typedef struct s_rd
 {
@@ -49,5 +46,24 @@ typedef enum e_quote
 	F_SQ,
 	F_LT
 }	t_quote;
+
+//minishell.c
+int		is_complete_command(char *input);
+void	join_input(char **input, int flag);
+t_list	*tokenizer(char *input);
+t_token	*init_token(void);
+void	add_text_struct(t_token *token, char **input);
+void	add_redirection_struct(t_token *token, char **input);
+
+//minishell_utils.c
+char	*ft_substrjoin(char *s1, char *s2, unsigned int s2_start, size_t s2_len);
+size_t	ft_strlen_md(const char *s);
+
+//get_txt.c
+char	*get_txt(char **input);
+char	*get_expanded_env(char **input, int *i);
+char	*get_changed_double_quote(char **input, int *quote, char *txt);
+char	*get_changed_single_quote(char **input, int *quote, char *txt);
+char	*get_changed_string(char **input, char *txt);
 
 #endif

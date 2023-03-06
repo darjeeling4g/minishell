@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/05 14:57:46 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/05 20:17:23 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,27 +60,59 @@ t_list	*tokenizer(char *input)
 	t_list	*new;
 	t_token	*token;
 
+	token = init_token();
+	res = NULL;
 	while (*input)
 	{
-		add_redirection_struct(token, &input);
-		add_text_struct();
-		if (*input == '|')
+		while (*input == ' ')
+			input++;
+		if (*input == '<' || *input == '>')
+			add_redirection_struct(token, &input);
+		else if (*input != '|')
+			add_text_struct(token, &input);
+		else if (*input == '|')
 		{
-			new = ft_lstnew(&token);
+			new = ft_lstnew(token);
 			ft_lstadd_back(&res, new);
+			token = init_token();
+			input++;
 		}
-		input++;
 	}
-	new = ft_lstnew(&token);
+	new = ft_lstnew(token);
 	ft_lstadd_back(&res, new);
 	return (res);
 }
 
+t_token	*init_token(void)
+{
+	t_token	*token;
+
+	token = (t_token *)malloc(sizeof(t_token) * 1);
+	if (!token)
+		exit(1);
+	token->rd = 0;
+	token->txt = 0;
+	return (token);
+}
+
+void	add_text_struct(t_token *token, char **input)
+{
+	t_list	*new;
+	char	*txt;
+
+	txt = get_txt(input);
+	new = ft_lstnew(txt);
+	ft_lstadd_back(&token->txt, new);
+}
+
 void	add_redirection_struct(t_token *token, char **input)
 {
+	t_list	*new;
 	t_rd	*rd;
 
-	rd = malloc(sizeof(t_rd) * 1);
+	rd = (t_rd *)malloc(sizeof(t_rd) * 1);
+	if (!rd)
+		exit(1);
 	if (**input == '<')
 	{
 		(*input)++;
@@ -104,11 +136,8 @@ void	add_redirection_struct(t_token *token, char **input)
 			rd->type = OUT;
 	}
 	rd->file = get_txt(input);
-}
-
-void	add_text_struct(t_token *token, char *input, int i)
-{
-	if (**input == SQ)
+	new = ft_lstnew(rd);
+	ft_lstadd_back(&(token->rd), new);
 }
 
 int main(void)
@@ -116,20 +145,44 @@ int main(void)
     t_list  *p_lst;
 	char	*input;
 	int		flag;
+	
+	t_token	*token;
+	t_list	*rd_lst;
+	t_list	*txt;
+	t_rd	*rd;
 
-    while ((input = readline("minishell$ ")) != NULL)
-	{
+		input = "<< infile | cat | ls | grep 'print this'| >> outfile";
+//    while ((input = readline("minishell$ ")) != NULL)
+//	{
 		flag = is_complete_command(input);
         join_input(&input, flag);
 		// Do something with the user's input
-        p_lst = tokenizer(input);
+        p_lst = tokenizer(input);//need to save pointer of the input!!!
+
+		// test!!
+		while (p_lst)
+		{
+			token = (t_token *)p_lst->content;
+			rd_lst = (t_list *)token->rd;
+			txt = (t_list *)token->txt;
+			while (rd_lst)
+			{
+				rd = (t_rd *)rd_lst->content;	
+				printf("type : %d, file : %s\n", rd->type, rd->file);
+				rd_lst = rd_lst->next;
+			}
+			while (txt)
+			{
+				printf("txt : %s\n", (char *)txt->content);
+				txt = txt->next;
+			}
+			p_lst = p_lst->next;
+//		}
 
 		// Add the input to the history
 		add_history(input);
-
 		// Free the memory allocated by readline()
-		free(input);
+//		free(input);
     }
-
     return 0;
 }
