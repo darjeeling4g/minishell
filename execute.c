@@ -25,13 +25,13 @@ void	interpret_token(t_list *tokens)
 	else if (pid != 0)
 		parent_do(tokens, pid, fds);
 	else
-		execute_first_command(tokens);
+		execute_command((t_token *)tokens->content, tokens->next, fds, 1);
 }
 
 void	parent_do(t_list *tokens, pid_t pid, int *fds[])
 {
-	int	i;
-	int	stat;
+	int		i;
+	int		stat;
 	t_list	*tmp;
 
 	close(fds[0][1]);
@@ -43,51 +43,69 @@ void	parent_do(t_list *tokens, pid_t pid, int *fds[])
 		pid = fork();
 		if (pid == -1)
 			put_error_message(errno);
-		else if (pid == 0 && !tokens->next)
-			execute_last_command(exc, i);
 		else if (pid == 0)
-			execute_mid_command(exc, i);
+			execute_command((t_token *)tokens->content, tokens->next, fds, 0);
 		dup2(fds[1][0], fds[0][0]);
-		close(fds[0][0]);
+		close(fds[1][0]);
 		close(fds[1][1]);
 		tokens = tokens->next;
 	}
-	i = -1;
-	while (++i < exc->num_cmd)
-		wait(&stat);
-	unlink("/tmp/here_doc");
-}
-
-void	execute_first_command(t_token *token, int (*fds)[2])
-{
-	int	fd;
-	t_rd	*rd;
-	char	*str;
-
-	close(fds[0][0]);
-	rd = (t_rd *)token->rd->content;
-	if (rd->type == IN && access(rd->file, F_OK))
-		put_error_message(errno);
-	if (exc->here_doc)
-		fd = open("/tmp/here_doc", O_RDONLY);
-	else
-		fd = open(exc->fls[0], O_RDONLY);
-	if (fd == -1)
-		put_error_message("Failed to open a file");
-	dup2(fd, 0);
-	dup2(exc->fds1[1], 1);
-	close(exc->fds1[1]);
-	close(fd);
-	if (execve(exc->cmds[exc->here_doc][0], exc->cmds[exc->here_doc], \
-	exc->ev) == -1)
+	while (tmp)
 	{
-		dup2(2, 1);
-		ft_printf("pipex: command not found: %s\n", exc->cmds[exc->here_doc][0]);
-		exit(1);
+		wait(&stat);
+		tmp = tmp->next;
 	}
 }
 
-void	redirection(t_list *rds, int (*fds)[2])
+void	execute_command(t_token *token, t_token *next , int (*fds)[2], int first)
+{
+	extern char	**environ;
+	char		**cmd;
+	char		*path;
+	
+	if (first)
+	{
+		if (next)
+			dup2(fds[0][1], 1);
+		close(fds[0][1]);
+	}
+	else
+	{
+		if (next)
+			dup2(fds[1][1], 1);
+		dup2(fds[0][0], 0);
+		close(fds[1][0]);
+		close(fds[1][1]);
+	}
+	close(fds[0][0]);
+	redirection(token->rd);
+	cmd = combine_command(token->txt);
+	path = getenv("PATH");
+	if (execve(path, cmd, environ))
+		put_error_message(errno);
+}
+
+char	**combine_command(t_list *txt)
+{
+	char	**res;
+	char	*cmd;
+	int		size;
+	int		i;
+
+	size = ft_lstsize(txt);
+	res = malloc(sizeof(char *) * size + 1);
+	res[size] = NULL;
+	i = 0;
+	while (i < size)
+	{
+		res[i] = (char *)txt->content;
+		txt = txt->next;
+		i++;
+	}
+	return (res);
+}
+
+void	redirection(t_list *rds)
 {
 	t_rd	*rd;
 	int		file;
@@ -100,41 +118,48 @@ void	redirection(t_list *rds, int (*fds)[2])
 			if (!access(rd->file, F_OK))
 				put_error_message(errno);
 			file = open(rd->file, O_RDONLY);
-			if (!file)
+			if (file == -1)
 				put_error_message(errno);
 			dup2(file, STDIN_FILENO);
 			close(file);
 		}
 		else if (rd->type == HRDC)
-			
+			get_here_doc_input(rd);
+		else
+		{
+			if (rd->type == OUT)
+				file = open(rd->file, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+			else if (rd->type == APND)
+				file = open(rd->file, O_CREAT | O_APPEND | O_WRONLY, 0644);
+			if (file == -1)
+				put_error_message(errno);
+			dup2(file, STDOUT_FILENO);
+			close(file);
+		}
 		rds = rds->next;
 	}	
 }
 
-void	get_here_doc_input(t_exc *exc)
+void	get_here_doc_input(t_rd *rd)
 {
 	char	*input;
 	size_t	str_len;
 	size_t	input_len;
 	char	*str;
-	int		fd;
 
-	str = exc->cmds[0][0];
+	str = rd->file;
 	str_len = ft_strlen(str);
-	fd = open("/tmp/here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1)
-		put_error_message("Failed to open a file");
 	while (1)
 	{
-		input = get_next_line(0);
+		input = readline("> ");
 		if (!input)
 			break ;
 		input_len = ft_strlen(input) - 1;
 		if (str_len == input_len && ft_strncmp(str, input, input_len) == 0)
 			break ;
-		write(fd, input, input_len + 1);
+		write(0, input, input_len + 1);
 		free(input);
 	}
-	close(fd);
-	free(input);
+	if (input)
+		free(input);
 }

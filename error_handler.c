@@ -14,6 +14,8 @@
 
 void	put_error_message(int errno)
 {
-	strerror(errno);
+	char	*errorstr;
+	errorstr = strerror(errno);
+	ft_putendl_fd(errorstr, 2);
 	exit(1);
 }
