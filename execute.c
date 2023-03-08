@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/06 19:51:57 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/08 20:29:17 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	interpret_token(t_list *tokens)
+void	interpret_token(t_list *tokens, char **envp)
 {
 	pid_t	pid;
 	int		fds[2][2];
@@ -23,12 +23,12 @@ void	interpret_token(t_list *tokens)
 	if (pid == -1)
 		put_error_message(errno);
 	else if (pid != 0)
-		parent_do(tokens, pid, fds);
+		parent_do(tokens, pid, fds, envp);
 	else
-		execute_command((t_token *)tokens->content, tokens->next, fds, 1);
+		execute_command(tokens, fds, 1, envp);
 }
 
-void	parent_do(t_list *tokens, pid_t pid, int *fds[])
+void	parent_do(t_list *tokens, pid_t pid, int *fds[], char **envp)
 {
 	int		i;
 	int		stat;
@@ -57,21 +57,22 @@ void	parent_do(t_list *tokens, pid_t pid, int *fds[])
 	}
 }
 
-void	execute_command(t_token *token, t_token *next , int (*fds)[2], int first)
+void	execute_command(t_list *tokens, int (*fds)[2], int first, char **envp)
 {
-	extern char	**environ;
+	t_token		*token;
 	char		**cmd;
 	char		*path;
 	
+	token = (t_token *)tokens->content;
 	if (first)
 	{
-		if (next)
+		if (tokens->next)
 			dup2(fds[0][1], 1);
 		close(fds[0][1]);
 	}
 	else
 	{
-		if (next)
+		if (tokens->next)
 			dup2(fds[1][1], 1);
 		dup2(fds[0][0], 0);
 		close(fds[1][0]);
@@ -80,8 +81,8 @@ void	execute_command(t_token *token, t_token *next , int (*fds)[2], int first)
 	close(fds[0][0]);
 	redirection(token->rd);
 	cmd = combine_command(token->txt);
-	path = getenv("PATH");
-	if (execve(path, cmd, environ))
+	path = find_bin(cmd[0], envp);
+	if (execve(path, cmd, envp))
 		put_error_message(errno);
 }
 
@@ -162,4 +163,46 @@ void	get_here_doc_input(t_rd *rd)
 	}
 	if (input)
 		free(input);
+}
+
+char	*get_env(t_list *envlst, const char *name)
+{
+	while (envlst)
+	{
+		if (ft_strnstr(envlst->content, name, ft_strlen(name)))
+			break ;
+		envlst = envlst->next;
+	}
+	if (!envlst)
+		return (NULL);
+	*(envlst->content)  += (ft_strlen(name) + 1);
+	return (envlst->content);
+}
+
+char	*find_bin(char *arg, char **envp)
+{
+	int		i;
+	char	**path_group;
+	char	*path;
+	char	*temp;
+
+	while (ft_strnstr(*envp, "PATH", 4) == 0)
+		envp++;
+	path_group = ft_split(*envp + 5, ':');
+	i = 0;
+	while (path_group[i])
+	{
+		temp = ft_strjoin(path_group[i], "/");
+		path = ft_strjoin(temp, arg);
+		if (access(path, F_OK) == 0)
+			break ;
+		free(temp);
+		free(path);
+		i++;
+	}
+	i = -1;
+	while (path_group[++i])
+		free(path_group[i]);
+	free(path_group);
+	return (path);
 }

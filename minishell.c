@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/06 15:52:41 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/08 20:29:39 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,9 +143,23 @@ void	add_redirection_struct(t_token *token, char **input)
 	ft_lstadd_back(&(token->rd), new);
 }
 
-int main(void)
+t_list	*get_env_list(char **envp)
+{
+	t_list 	*res;
+	t_list	*new;
+
+	while (*envp)
+	{
+		new = ft_lstnew(*envp);
+		ft_lstadd_back(&res, new);
+	}
+	return (res);
+}
+
+int main(int argc, char **argv, char **envp)
 {
     t_list  *p_lst;
+	t_list	*e_lst;
 	char	*input;
 	int		flag;
 	
@@ -153,7 +167,9 @@ int main(void)
 	t_list	*rd_lst;
 	t_list	*txt;
 	t_rd	*rd;
-
+	(void)argc;
+	(void)argv;
+	e_lst = get_envp_list(envp);
 //		input = "<< infile | cat | ls | grep \"print this\"string| >> outfile";
    while ((input = readline("minishell$ ")) != NULL)
 	{
@@ -182,11 +198,11 @@ int main(void)
 			printf("==========pipe========\n");
 			p_lst = p_lst->next;
 		}
-
 		// Add the input to the history
 		add_history(input);
 		// Free the memory allocated by readline()
 		free(input);
+		interpret_token(p_lst, dup_envp);
     }
     return 0;
 }

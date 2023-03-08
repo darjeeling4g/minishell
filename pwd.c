@@ -1,12 +1,13 @@
 #include "minishell.h"
 
-int	execute_pwd(t_token *token)
+int	execute_pwd(char **envp)
 {
-	char cwd[1024];
-	
-	if (getcwd(cwd, sizeof(cwd)) != NULL) 
-		ft_printf(cwd);
+	char	*pwd;
+
+	pwd = get_env(envp, "PWD");
+	if (pwd != NULL)
+		ft_printf("%s\n", pwd);
 	else
-		put_error_message(errno);
-	return (0);
+		return (-1);
+	exit(0);
 }

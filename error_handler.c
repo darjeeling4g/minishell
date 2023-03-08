@@ -19,3 +19,14 @@ void	put_error_message(int errno)
 	ft_putendl_fd(errorstr, 2);
 	exit(1);
 }
+
+void	free_array(char **arr, int idx)
+{
+	int	i;
+
+	i = -1;
+	while (++i < idx)
+		free(arr[i]);
+	free(arr);
+	eixt(1);
+}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/06 19:32:43 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/08 20:53:13 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ t_list	*tokenizer(char *input);
 t_token	*init_token(void);
 void	add_text_struct(t_token *token, char **input);
 void	add_redirection_struct(t_token *token, char **input);
+char	**get_duplicate_envp(char **envp);
 
 //minishell_utils.c
 char	*ft_substrjoin(char *s1, char *s2, unsigned int s2_start, size_t s2_len);
@@ -69,4 +70,16 @@ char	*get_changed_string(char **input, char *txt);
 
 //error_handler.
 void	put_error_message(int errno);
+void	free_array(char **arr, int idx);
+
+//execute.c
+void	interpret_token(t_list *tokens, char **envp);
+void	parent_do(t_list *tokens, pid_t pid, int *fds[], char **envp);
+void	execute_command(t_token *token, int (*fds)[2], int first, char **envp);
+char	**combine_command(t_list *txt);
+void	redirection(t_list *rds);
+char	*get_env(t_list *envlst, const char *name);
+char	*find_bin(char *arg, char **envp);
+
+int	execute_pwd(char **envp);
 #endif
