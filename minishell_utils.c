@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 18:10:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/05 18:16:52 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/09 23:55:54 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,40 @@ size_t	ft_strlen_md(const char *s)
 		i++;
 	}
 	return (i);
+}
+
+char	**list_to_array(t_list *lst)
+{
+	char	**res;
+	int		size;
+	int		i;
+
+	size = ft_lstsize(lst);
+	if (!size)
+		return (NULL);
+	res = malloc(sizeof(char *) * size + 1);
+	res[size] = NULL;
+	i = 0;
+	while (i < size)
+	{
+		res[i] = (char *)lst->content;
+		lst = lst->next;
+		i++;
+	}
+	return (res);
+}
+
+t_list	*array_to_list(char **arr)
+{
+	t_list 	*res;
+	t_list	*new;
+
+	res = NULL;
+	while (*arr)
+	{
+		new = ft_lstnew(*arr);
+		ft_lstadd_back(&res, new);
+		arr++;
+	}
+	return (res);
 }
