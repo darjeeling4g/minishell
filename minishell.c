@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 00:17:53 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 04:06:31 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int main(int argc, char **argv, char **envp)
 			flag = is_complete_command(input);
 			join_input(&input, flag);
 			// // Do something with the user's input
-			p_lst = tokenizer(input);//need to save pointer of the input!!!
+			p_lst = tokenizer(input);
 			
 			//test!!
 			// while (p_lst)

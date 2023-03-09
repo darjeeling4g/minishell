@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 00:19:57 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 02:39:53 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft.h"
+# include "get_next_line.h" 
 # define HRDC 0
 # define APND 1 
 # define IN 2
@@ -28,6 +29,8 @@
 # define DQ '\"'
 # define CLOSED 0
 # define UNCLOSED 1
+# define EXIT 0
+# define CONT 1
 
 typedef struct s_token
 {
@@ -54,7 +57,7 @@ int		is_complete_command(char *input);
 
 //minishell_utils.c
 char	*ft_substrjoin(char *s1, char *s2, unsigned int s2_start, size_t s2_len);
-size_t	ft_strlen_md(const char *s);
+//size_t	ft_strlen_md(const char *s);
 char	**list_to_array(t_list *lst);
 t_list	*array_to_list(char **arr);
 
@@ -72,7 +75,7 @@ char	*get_changed_single_quote(char **input, int *quote, char *txt);
 char	*get_changed_string(char **input, char *txt);
 
 //error_handler.c
-void	put_error_message(void);
+void	put_error_message(int type);
 void	free_array(char **arr, int idx);
 
 //execute.c

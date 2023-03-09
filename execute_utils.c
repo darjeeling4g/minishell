@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/09 22:46:46 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 02:54:39 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,17 @@ void	redirection(t_list *rds)
 		rd = (t_rd *)rds->content;
 		if (rd->type == IN)
 		{
-			if (!access(rd->file, F_OK))
-				put_error_message();
 			file = open(rd->file, O_RDONLY);
 			if (file == -1)
-				put_error_message();
+				put_error_message(EXIT);
 			dup2(file, STDIN_FILENO);
 			close(file);
 		}
 		else if (rd->type == HRDC)
+		{
 			get_here_doc_input(rd);
+			write(0, rd->file, ft_strlen(rd->file));
+		}
 		else
 		{
 			if (rd->type == OUT)
@@ -39,9 +40,9 @@ void	redirection(t_list *rds)
 			else if (rd->type == APND)
 				file = open(rd->file, O_CREAT | O_APPEND | O_WRONLY, 0644);
 			if (file == -1)
-				put_error_message();
+				put_error_message(EXIT);
 			dup2(file, STDOUT_FILENO);
-			close(file);
+			close(file); 
 		}
 		rds = rds->next;
 	}	
@@ -50,25 +51,26 @@ void	redirection(t_list *rds)
 void	get_here_doc_input(t_rd *rd)
 {
 	char	*input;
-	size_t	str_len;
-	size_t	input_len;
-	char	*str;
+	char	*rd_line;
+	size_t	rd_len;
+	size_t	lmt_len;
 
-	str = rd->file;
-	str_len = ft_strlen(str);
+	input = 0;
+	lmt_len = ft_strlen(rd->file);
 	while (1)
 	{
-		input = readline("> ");
-		if (!input)
+		write(1, "> ", 3);
+		rd_line = get_next_line(0);
+		if (!rd_line)
 			break ;
-		input_len = ft_strlen(input) - 1;
-		if (str_len == input_len && ft_strncmp(str, input, input_len) == 0)
+		rd_len = ft_strlen(rd_line) - 1;
+		if (lmt_len == rd_len && ft_strncmp(rd->file, rd_line, rd_len) == 0)
 			break ;
-		write(0, input, input_len + 1);
-		free(input);
+		input = ft_substrjoin(input, rd_line, 0, ft_strlen(rd_line));
+		free(rd_line);
 	}
-	if (input)
-		free(input);
+	free(rd->file);
+	rd->file = input;
 }
 
 char	*get_env(t_list *e_lst, const char *name)

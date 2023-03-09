@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/09 23:04:57 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 02:38:42 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,28 +26,28 @@ int	execute_env(t_list *e_lst)
 	return (0);
 }
 
-int	execute_export(char** cmd, t_list *e_lst)
+int	execute_export(char	**cmd, t_list *e_lst)
 {
 	t_list	*new;
 	t_list	*tmp;
 	char	**str;
 
 	cmd++;
-	if (*cmd)
+	if (!*cmd)
 		print_sorted_envp(e_lst);
 	else
 	{
-		while (cmd)
+		while (!*cmd)
 		{
 			str = ft_split(*cmd, '=');
 			if (!is_valid_cmd(str[0]))
 			{
 				free_array(str, -1);
-				return (-1);
+				put_error_message(CONT);
 			}
 			new = ft_lstnew(*cmd);
 			if (!new)
-				return (-1);
+				put_error_message(CONT);
 			tmp = get_env_node(str[0], e_lst);
 			free_array(str, -1);
 			if (tmp)
@@ -97,8 +97,8 @@ void	print_sorted_envp(t_list *e_lst)
 	i = -1;
     while (arr[++i])
 	{
-		j = i + 1;
-        while (arr[j++]) 
+		j = i;
+        while (arr[++j]) 
 		{
             if (ft_strncmp(arr[i], arr[j], 1) > 0) 
 			{

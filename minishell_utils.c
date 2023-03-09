@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 18:10:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/09 23:55:54 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 02:39:52 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,23 +26,24 @@ char	*ft_substrjoin(char *s1, char *s2, unsigned int s2_start, size_t s2_len)
 	return (str);
 }
 
-size_t	ft_strlen_md(const char *s)
-{
-	size_t	i;
+// size_t	ft_strlen_md(const char *s)
+// {
+// 	size_t	i;
 
-	i = 0;
-	if (!s)
-		return (0);
-	while (s[i])
-	{
-		i++;
-	}
-	return (i);
-}
+// 	i = 0;
+// 	if (!s)
+// 		return (0);
+// 	while (s[i])
+// 	{
+// 		i++;
+// 	}
+// 	return (i);
+// }
 
 char	**list_to_array(t_list *lst)
 {
 	char	**res;
+	char	*str;
 	int		size;
 	int		i;
 
@@ -54,7 +55,8 @@ char	**list_to_array(t_list *lst)
 	i = 0;
 	while (i < size)
 	{
-		res[i] = (char *)lst->content;
+		str = ft_strdup((char *)lst->content);
+		res[i] = str;
 		lst = lst->next;
 		i++;
 	}
@@ -63,13 +65,17 @@ char	**list_to_array(t_list *lst)
 
 t_list	*array_to_list(char **arr)
 {
-	t_list 	*res;
+	t_list	*res;
 	t_list	*new;
+	char	*str;
 
 	res = NULL;
 	while (*arr)
 	{
-		new = ft_lstnew(*arr);
+		str = ft_strdup(*arr);
+		if (!str)
+			put_error_message(EXIT);
+		new = ft_lstnew(str);
 		ft_lstadd_back(&res, new);
 		arr++;
 	}

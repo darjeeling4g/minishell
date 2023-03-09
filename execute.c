@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 00:07:34 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 01:03:24 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ void	parent_do(t_list *tokens, pid_t pid, int (*fds)[2],  t_list *e_lst)
 
 	close(fds[0][1]);
 	tmp = tokens;
+	tokens = tokens->next;
 	while (tokens)
 	{
 		if (pipe(fds[1]) == -1)
