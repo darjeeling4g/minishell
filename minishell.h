@@ -6,12 +6,13 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 02:39:53 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 17:01:38 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+# include <string.h>
 # include <unistd.h>
 # include <sys/errno.h>
 # include <fcntl.h>
@@ -88,10 +89,11 @@ char	*get_env(t_list *e_lst, const char *name);
 char	*find_bin(char *arg, char **envp);
 void	redirection(t_list *rds);
 void	get_here_doc_input(t_rd *rd);
+
 //check_builtin.c
 int		is_builtin(t_list *cmdlst);
 void	execute_builtin_command(t_token *token, t_list *e_lst);
-int		is_valid_cmd(char *cmd);
+int		is_valid_name(char *name);
 
 //builtins.c
 int		execute_echo(char **cmd);
@@ -104,6 +106,6 @@ int		execute_env(t_list *e_lst);
 int		execute_export(char** cmd, t_list *e_lst);
 int		execute_unset(char **cmd, t_list *e_lst);
 void	print_sorted_envp(t_list *e_lst);
-t_list	*get_env_node(char *cmd, t_list *e_lst);
+t_list	*get_env_node(char *name, t_list *e_lst);
 
 #endif

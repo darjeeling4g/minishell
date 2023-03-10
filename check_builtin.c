@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/09 23:44:41 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 17:09:07 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,18 +50,19 @@ void	execute_builtin_command(t_token *token, t_list *e_lst)
 		execute_exit();
 }
 
-int	is_valid_cmd(char *cmd)
+int	is_valid_name(char *name)
 {
 	int		res;
 
 	res = 1;
-	if (!ft_isalpha(*(cmd++)))
+	if (!ft_isalpha(*name))
 		res = 0;
-	while (cmd)
+	name++;
+	while (*name)
 	{
-		if (!ft_isalnum(*cmd))
+		if (!ft_isalnum(*name))
 			res = 0;
-		cmd++;
+		name++;
 	}
 	return (res);
 }

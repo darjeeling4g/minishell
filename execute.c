@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 01:03:24 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 16:39:19 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ void	interpret_token(t_list *tokens, t_list *e_lst)
 	else
 	{
 		if (pipe(fds[0]) == -1)
-			put_error_message();
+			put_error_message(EXIT);
 		pid = fork();
 		if (pid == -1)
-			put_error_message();
+			put_error_message(EXIT);
 		else if (pid != 0)
 			parent_do(tokens, pid, fds, e_lst);
 		else
@@ -46,10 +46,10 @@ void	parent_do(t_list *tokens, pid_t pid, int (*fds)[2],  t_list *e_lst)
 	while (tokens)
 	{
 		if (pipe(fds[1]) == -1)
-			put_error_message();
+			put_error_message(EXIT);
 		pid = fork();
 		if (pid == -1)
-			put_error_message();
+			put_error_message(EXIT);
 		else if (pid == 0)
 			execute_command(tokens, fds, 0, e_lst);
 		dup2(fds[1][0], fds[0][0]);
@@ -94,5 +94,5 @@ void	execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 	envp = list_to_array(e_lst);
 	path = find_bin(cmd[0], envp);
 	if (execve(path, cmd, envp))
-		put_error_message();
+		put_error_message(EXIT);
 }

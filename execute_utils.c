@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 02:54:39 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 16:54:01 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,7 @@ void	redirection(t_list *rds)
 			close(file);
 		}
 		else if (rd->type == HRDC)
-		{
 			get_here_doc_input(rd);
-			write(0, rd->file, ft_strlen(rd->file));
-		}
 		else
 		{
 			if (rd->type == OUT)
@@ -42,7 +39,7 @@ void	redirection(t_list *rds)
 			if (file == -1)
 				put_error_message(EXIT);
 			dup2(file, STDOUT_FILENO);
-			close(file); 
+			close(file);
 		}
 		rds = rds->next;
 	}	
@@ -54,6 +51,7 @@ void	get_here_doc_input(t_rd *rd)
 	char	*rd_line;
 	size_t	rd_len;
 	size_t	lmt_len;
+	int		fd[2];
 
 	input = 0;
 	lmt_len = ft_strlen(rd->file);
@@ -71,6 +69,12 @@ void	get_here_doc_input(t_rd *rd)
 	}
 	free(rd->file);
 	rd->file = input;
+	if (pipe(fd) == -1)
+		put_error_message(EXIT);
+	write(fd[1], input, ft_strlen(input));
+	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
+	close(fd[1]);
 }
 
 char	*get_env(t_list *e_lst, const char *name)

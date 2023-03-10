@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 02:38:42 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/10 17:23:24 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,26 +30,26 @@ int	execute_export(char	**cmd, t_list *e_lst)
 {
 	t_list	*new;
 	t_list	*tmp;
-	char	**str;
+	char	**env;
 
 	cmd++;
 	if (!*cmd)
 		print_sorted_envp(e_lst);
 	else
 	{
-		while (!*cmd)
+		while (*cmd)
 		{
-			str = ft_split(*cmd, '=');
-			if (!is_valid_cmd(str[0]))
+			env = ft_split(*cmd, '=');
+			if (!is_valid_name(env[0]))
 			{
-				free_array(str, -1);
-				put_error_message(CONT);
+				free_array(env, -1);
+				return (1);
 			}
 			new = ft_lstnew(*cmd);
 			if (!new)
-				put_error_message(CONT);
-			tmp = get_env_node(str[0], e_lst);
-			free_array(str, -1);
+				return (1);
+			tmp = get_env_node(env[0], e_lst);
+			free_array(env, -1);
 			if (tmp)
 			{
 				new->next = tmp->next->next;
@@ -72,7 +72,7 @@ int	execute_unset(char **cmd, t_list *e_lst)
 	cmd++;
 	while (*cmd)
 	{
-		if (!is_valid_cmd(*cmd))
+		if (!is_valid_name(*cmd))
 			return (-1);
 		env = get_env_node(*cmd, e_lst);
 		if (env)
@@ -95,26 +95,26 @@ void	print_sorted_envp(t_list *e_lst)
 
 	arr = list_to_array(e_lst);
 	i = -1;
-    while (arr[++i])
+	while (arr[++i])
 	{
 		j = i;
-        while (arr[++j]) 
+		while (arr[++j])
 		{
-            if (ft_strncmp(arr[i], arr[j], 1) > 0) 
+			if (ft_strncmp(arr[i], arr[j], 1) > 0)
 			{
 				tmp = arr[i];
 				arr[i] = arr[j];
 				arr[j] = tmp;
 			}
-        }
-    }
+		}
+	}
 	i = -1;
 	while (arr[++i])
 		printf("declare -x %s\n", arr[i]);
 	free_array(arr, -1);
 }
 
-t_list	*get_env_node(char *cmd, t_list *e_lst)
+t_list	*get_env_node(char *name, t_list *e_lst)
 {
 	char 	*env;
 	size_t	size;
@@ -123,8 +123,8 @@ t_list	*get_env_node(char *cmd, t_list *e_lst)
 	{
 		env = (char *)e_lst->next->content;
 		size = -1;
-		while (env[++size] != '=');
-		if (size == ft_strlen(cmd) && !ft_strncmp(cmd, env, size))
+		while (env[++size] != '=' && env[size] != '\0');
+		if (size == ft_strlen(name) && !ft_strncmp(name, env, size))
 			return (e_lst);
 		e_lst = e_lst->next;
 	}	
