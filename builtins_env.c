@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 17:23:24 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/22 20:49:27 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,6 @@ t_list	*get_env_node(char *name, t_list *e_lst)
 		if (size == ft_strlen(name) && !ft_strncmp(name, env, size))
 			return (e_lst);
 		e_lst = e_lst->next;
-	}	
+	}
 	return (NULL);
 }
