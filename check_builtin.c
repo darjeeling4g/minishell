@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 17:09:07 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/24 21:53:32 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,11 @@ void	execute_builtin_command(t_token *token, t_list *e_lst)
 {
 	char	**cmd;
 	int		cmdlen;
+	int		org_fd[2];
 
+	org_fd[0] = dup(STDIN_FILENO);
+	org_fd[1] = dup(STDOUT_FILENO);
+	redirection(token->rd);
 	cmd = list_to_array(token->txt);
 	cmdlen = ft_strlen(*cmd);
 	if (ft_strncmp("echo", *cmd, cmdlen) == 0)
@@ -48,6 +52,10 @@ void	execute_builtin_command(t_token *token, t_list *e_lst)
 		execute_env(e_lst);
 	else
 		execute_exit();
+	dup2(org_fd[0], STDIN_FILENO);
+	dup2(org_fd[1], STDOUT_FILENO);
+	close(org_fd[0]);
+	close(org_fd[1]);
 }
 
 int	is_valid_name(char *name)
