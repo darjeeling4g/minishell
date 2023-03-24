@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/24 20:03:38 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/24 22:49:31 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void interpret_token(t_list *tokens, t_list *e_lst)
 void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 {
 	int stat;
+	char exit_code;
 	t_list *tmp;
 
 	close(fds[0][1]);
@@ -62,6 +63,9 @@ void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 		wait(&stat);
 		tmp = tmp->next;
 	}
+	exit_code = (char)(stat >> 8);
+	printf("%d\n", (int)exit_code);
+	
 }
 
 void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
@@ -75,6 +79,7 @@ void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 
 	fd = 0;
 	token = (t_token *)tokens->content;
+	fd = dup(STDIN_FILENO);
 	if (first)
 	{
 		if (tokens->next)
@@ -85,7 +90,6 @@ void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 	{
 		if (tokens->next)
 			dup2(fds[1][1], 1);
-		fd = dup(STDIN_FILENO);
 		dup2(fds[0][0], 0);
 		close(fds[1][0]);
 		close(fds[1][1]);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 16:54:01 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/24 22:36:28 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void get_here_doc_input(t_rd *rd, int infd)
 	while (1)
 	{
 		write(1, "> ", 3);
-		rd_line = get_next_line(fd[1]);
+		rd_line = get_next_line(infd);
 		if (!rd_line)
 			break;
 		rd_len = ft_strlen(rd_line) - 1;

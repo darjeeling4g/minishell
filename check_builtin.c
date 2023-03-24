@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_builtin.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/24 22:01:01 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/24 22:36:43 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void execute_builtin_command(t_token *token, t_list *e_lst)
 
 	org_fd[0] = dup(STDIN_FILENO);
 	org_fd[1] = dup(STDOUT_FILENO);
-	redirection(token->rd);
+	redirection(token->rd, 0);
 	cmd = list_to_array(token->txt);
 	cmdlen = ft_strlen(*cmd);
 	if (ft_strncmp("echo", *cmd, cmdlen) == 0)
