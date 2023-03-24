@@ -12,12 +12,12 @@
 
 #include "minishell.h"
 
-void	save_input_mode(struct termios *org_term)
+void save_input_mode(struct termios *org_term)
 {
 	tcgetattr(STDOUT_FILENO, org_term);
 }
 
-void	set_input_mode(struct termios *new_term)
+void set_input_mode(struct termios *new_term)
 {
 	tcgetattr(STDOUT_FILENO, new_term);
 	new_term->c_lflag &= ~(ICANON | ECHOCTL);
@@ -26,12 +26,12 @@ void	set_input_mode(struct termios *new_term)
 	tcsetattr(STDOUT_FILENO, TCSANOW, new_term);
 }
 
-void	reset_input_mode(struct termios *org_term)
+void reset_input_mode(struct termios *org_term)
 {
 	tcsetattr(STDOUT_FILENO, TCSANOW, org_term);
 }
 
-void	signal_handler(int sig)
+void signal_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -40,24 +40,20 @@ void	signal_handler(int sig)
 		rl_replace_line("", 1);
 		rl_redisplay();
 	}
-	else
-	{
-		rl_redisplay();
-	}
 }
 
 int main(int argc, char **argv, char **envp)
 {
-	t_list	*p_lst;
-	t_list	*e_lst;
-	char	*input;
-	int		flag;
-	struct termios	termattr[2];
+	t_list *p_lst;
+	t_list *e_lst;
+	char *input;
+	int flag;
+	struct termios termattr[2];
 
 	save_input_mode(&termattr[ORG]);
 	set_input_mode(&termattr[NEW]);
 	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
 	(void)argc;
 	(void)argv;
 	e_lst = array_to_list(envp);
@@ -77,10 +73,10 @@ int main(int argc, char **argv, char **envp)
 	return 0;
 }
 
-void	join_input(char **input, int flag)
+void join_input(char **input, int flag)
 {
-	char	*tmp;
-	char	*add_input;
+	char *tmp;
+	char *add_input;
 
 	while (flag != 1)
 	{
@@ -93,15 +89,15 @@ void	join_input(char **input, int flag)
 		*input = ft_strjoin(*input, add_input);
 		flag = is_complete_command(*input);
 		printf("=>%d, %s\n", flag, *input);
-		free (tmp);
-		free (add_input);
+		free(tmp);
+		free(add_input);
 	}
 }
 
-int	is_complete_command(char *input)
+int is_complete_command(char *input)
 {
-	int	i;
-	int	flag;
+	int i;
+	int flag;
 
 	i = -1;
 	flag = 1;
