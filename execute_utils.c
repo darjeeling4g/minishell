@@ -12,10 +12,10 @@
 
 #include "minishell.h"
 
-void	redirection(t_list *rds)
+void redirection(t_list *rds, int fd)
 {
-	t_rd	*rd;
-	int		file;
+	t_rd *rd;
+	int file;
 
 	while (rds)
 	{
@@ -29,7 +29,7 @@ void	redirection(t_list *rds)
 			close(file);
 		}
 		else if (rd->type == HRDC)
-			get_here_doc_input(rd);
+			get_here_doc_input(rd, fd);
 		else
 		{
 			if (rd->type == OUT)
@@ -42,51 +42,52 @@ void	redirection(t_list *rds)
 			close(file);
 		}
 		rds = rds->next;
-	}	
+	}
 }
 
-void	get_here_doc_input(t_rd *rd)
+void get_here_doc_input(t_rd *rd, int infd)
 {
-	char	*input;
-	char	*rd_line;
-	size_t	rd_len;
-	size_t	lmt_len;
-	int		fd[2];
+	char *input;
+	char *rd_line;
+	size_t rd_len;
+	size_t lmt_len;
+	int fd[2];
 
+	if (pipe(fd) == -1)
+		put_error_message(EXIT);
 	input = 0;
 	lmt_len = ft_strlen(rd->file);
 	while (1)
 	{
 		write(1, "> ", 3);
-		rd_line = get_next_line(0);
+		rd_line = get_next_line(fd[1]);
 		if (!rd_line)
-			break ;
+			break;
 		rd_len = ft_strlen(rd_line) - 1;
 		if (lmt_len == rd_len && ft_strncmp(rd->file, rd_line, rd_len) == 0)
-			break ;
+			break;
 		input = ft_substrjoin(input, rd_line, 0, ft_strlen(rd_line));
 		free(rd_line);
 	}
 	free(rd->file);
 	rd->file = input;
-	if (pipe(fd) == -1)
-		put_error_message(EXIT);
 	write(fd[1], input, ft_strlen(input));
 	dup2(fd[0], STDIN_FILENO);
 	close(fd[0]);
 	close(fd[1]);
 }
 
-char	*get_env(t_list *e_lst, const char *name)
+char *get_env(t_list *e_lst, const char *name)
 {
-	char	*str;
-	size_t	size;
+	char *str;
+	size_t size;
 
 	while (e_lst)
 	{
 		str = (char *)e_lst->content;
 		size = -1;
-		while (str[++size] != '=');
+		while (str[++size] != '=')
+			;
 		if (size == ft_strlen(name) && !ft_strncmp(str, name, size))
 			break;
 		e_lst = e_lst->next;
@@ -97,12 +98,12 @@ char	*get_env(t_list *e_lst, const char *name)
 	return (str);
 }
 
-char	*find_bin(char *arg, char **envp)
+char *find_bin(char *arg, char **envp)
 {
-	int		i;
-	char	**path_group;
-	char	*path;
-	char	*temp;
+	int i;
+	char **path_group;
+	char *path;
+	char *temp;
 
 	while (ft_strnstr(*envp, "PATH", 4) == 0)
 		envp++;
@@ -113,7 +114,7 @@ char	*find_bin(char *arg, char **envp)
 		temp = ft_strjoin(path_group[i], "/");
 		path = ft_strjoin(temp, arg);
 		if (access(path, F_OK) == 0)
-			break ;
+			break;
 		free(temp);
 		free(path);
 		i++;
