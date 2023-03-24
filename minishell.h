@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/23 15:55:05 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/24 19:19:53 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <unistd.h>
 # include <sys/errno.h>
 # include <signal.h>
+# include <term.h>
 # include <fcntl.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -33,6 +34,8 @@
 # define UNCLOSED 1
 # define EXIT 0
 # define CONT 1
+# define ORG 0
+# define NEW 1
 
 typedef struct s_token
 {

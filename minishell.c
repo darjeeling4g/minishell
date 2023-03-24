@@ -3,31 +3,47 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/23 18:47:55 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/24 19:52:59 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sigint_handler(int sig)
+void	save_input_mode(struct termios *org_term)
+{
+	tcgetattr(STDOUT_FILENO, org_term);
+}
+
+void	set_input_mode(struct termios *new_term)
+{
+	tcgetattr(STDOUT_FILENO, new_term);
+	new_term->c_lflag &= ~(ICANON | ECHOCTL);
+	// new_term->c_cc[VMIN] = 1;
+	// new_term->c_cc[VTIME] = 0;
+	tcsetattr(STDOUT_FILENO, TCSANOW, new_term);
+}
+
+void	reset_input_mode(struct termios *org_term)
+{
+	tcsetattr(STDOUT_FILENO, TCSANOW, org_term);
+}
+
+void	signal_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
-		//rl_point = rl_end - 2;
 		printf("\n");
 		rl_on_new_line();
-		// rl_replace_line("", 1);
+		rl_replace_line("", 1);
 		rl_redisplay();
 	}
-}
-
-void    init_rl_catch_signals(void)
-{
-    extern int  rl_catch_signals;
-    rl_catch_signals = 0;
+	else
+	{
+		rl_redisplay();
+	}
 }
 
 int main(int argc, char **argv, char **envp)
@@ -36,54 +52,28 @@ int main(int argc, char **argv, char **envp)
 	t_list	*e_lst;
 	char	*input;
 	int		flag;
-	
-	// t_token	*token;
-	// t_list	*rd_lst;
-	// t_list	*txt;
-	// t_rd	*rd;
-	init_rl_catch_signals();
-	signal(SIGINT, sigint_handler);
-	write(2, "signal execute\n", 20);
+	struct termios	termattr[2];
+
+	save_input_mode(&termattr[ORG]);
+	set_input_mode(&termattr[NEW]);
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
 	(void)argc;
 	(void)argv;
 	e_lst = array_to_list(envp);
-//	input = "<";
 	while ((input = readline("minishell$ ")) != NULL)
 	{
 		if (*input)
 		{
 			flag = is_complete_command(input);
 			join_input(&input, flag);
-			// // Do something with the user's input
 			p_lst = tokenizer(input);
-			
-			//test!!
-			// while (p_lst)
-			// {
-			// 	token = (t_token *)p_lst->content;
-			// 	rd_lst = (t_list *)token->rd;
-			// 	txt = (t_list *)token->txt;
-			// 	while (rd_lst)
-			// 	{
-			// 		rd = (t_rd *)rd_lst->content;	
-			// 		printf("type : %d, file : %s\n", rd->type, rd->file);
-			// 		rd_lst = rd_lst->next;
-			// 	}
-			// 	while (txt)
-			// 	{
-			// 		printf("txt : %s\n", (char *)txt->content);
-			// 		txt = txt->next;
-			// 	}
-			// 	printf("==========pipe========\n");
-			// 	p_lst = p_lst->next;
-			// }
-			// Add the input to the history
 			add_history(input);
-			// Free the memory allocated by readline()
 			free(input);
 			interpret_token(p_lst, e_lst);
 		}
 	}
+	reset_input_mode(&termattr[ORG]);
 	return 0;
 }
 

@@ -6,7 +6,7 @@
 #    By: danpark <danpark@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 18:47:25 by danpark           #+#    #+#              #
-#    Updated: 2023/03/09 22:22:52 by danpark          ###   ########.fr        #
+#    Updated: 2023/03/24 19:30:10 by danpark          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ OBJS_M = ${SRCS_M:.c=.o}
 NAME = minishell
 CPPFLAGS = -I libft -I ~/goinfre/.brew/opt/readline/include
 LDFLAGS = -L libft -L ~/goinfre/.brew/opt/readline/lib
-LDLIBS = -lft -lreadline
+LDLIBS = -lft -lreadline -lncurses
 
 all = $(NAME)
 

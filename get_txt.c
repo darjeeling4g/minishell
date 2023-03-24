@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 12:44:24 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 00:03:09 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/24 15:14:06 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,12 @@ char	*get_expanded_env(char **input, int *i)
 	char	*env;
 	char	*tmp;
 
+	if ((*input)[*i + 1] == DQ || (*input)[*i + 1] == SQ)
+		return (0);
 	start = ++(*i);
-	while (ft_isalnum((*input)[*i]))
+	// if (ft_isdigit((*input)[*i]))
+	// 	return (0);
+	while (ft_isalnum((*input)[*i]) || (*input)[*i] == '_')
 		(*i)++;
 	if (*i - start == 0)
 		return (0);
@@ -74,7 +78,7 @@ char	*get_changed_double_quote(char **input, int *quote, char *txt)
 	char	*env;//expanded env
 
 	i = 0;
-	(*input)++;//start after $
+	(*input)++;//start after "
 	start = i;
 	while (quote[F_DQ] == UNCLOSED)//it will recur until quotation open
 	{
