@@ -51,24 +51,24 @@ void execute_builtin_command(t_token *token, t_list *e_lst)
 	else if (ft_strncmp("env", *cmd, cmdlen) == 0)
 		execute_env(e_lst);
 	else
-		execute_exit();
+		execute_exit(token);
 	dup2(org_fd[0], STDIN_FILENO);
 	dup2(org_fd[1], STDOUT_FILENO);
 	close(org_fd[0]);
 	close(org_fd[1]);
 }
-
+//added checking under bar
 int is_valid_name(char *name)
 {
 	int res;
 
 	res = 1;
-	if (!ft_isalpha(*name))
+	if (!ft_isalpha(*name) || *name != '_')
 		res = 0;
 	name++;
 	while (*name)
 	{
-		if (!ft_isalnum(*name))
+		if (!ft_isalnum(*name) || *name != '_')
 			res = 0;
 		name++;
 	}

@@ -17,8 +17,8 @@ CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
 OBJS_M = ${SRCS_M:.c=.o}
 NAME = minishell
-CPPFLAGS = -I libft -I ~/goinfre/.brew/opt/readline/include
-LDFLAGS = -L libft -L ~/goinfre/.brew/opt/readline/lib
+CPPFLAGS = -I libft -I ~/goinfre/.brew/opt/readline/include -I /opt/homebrew/Cellar/readline/8.2.1/include
+LDFLAGS = -L libft -L ~/goinfre/.brew/opt/readline/lib -L /opt/homebrew/Cellar/readline/8.2.1/lib
 LDLIBS = -lft -lreadline -lncurses
 
 all = $(NAME)

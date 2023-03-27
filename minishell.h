@@ -100,10 +100,10 @@ void execute_builtin_command(t_token *token, t_list *e_lst);
 int is_valid_name(char *name);
 
 // builtins.c
-int execute_echo(char **cmd);
-int execute_cd(char **cmd, t_list *e_lst);
-int execute_pwd(t_list *e_lst);
-void execute_exit(void);
+int		execute_echo(char **cmd);
+int 	execute_cd(char **cmd, t_list *e_lst);
+int 	execute_pwd(t_list *e_lst);
+void	execute_exit(t_token *token);
 
 // builtins_env.c
 int execute_env(t_list *e_lst);

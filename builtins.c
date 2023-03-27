@@ -61,7 +61,27 @@ int	execute_pwd(t_list *e_lst)
 	exit(0);
 }
 
-void	execute_exit(void)
+void	execute_exit(t_token *token)
 {
-	exit(0);
+	t_list	*rd;
+	t_list	*txt;
+	char	*exitcode;
+	int		i;
+
+	rd = token->rd;
+	txt = token->txt;
+	if (!rd && !txt->next)
+		exit(0);
+	exitcode = (char *)txt->next->content;
+	i = -1;
+	while (exitcode[++i])
+	{
+		if (!ft_isdigit(exitcode[i]))
+			exit(255);
+		
+	}
+	if (rd || txt->next->next)
+		exit(255);
+	else
+		exit((char *)txt->next->content);
 }

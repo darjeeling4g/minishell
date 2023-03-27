@@ -102,5 +102,8 @@ void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 	envp = list_to_array(e_lst);
 	path = find_bin(cmd[0], envp);
 	if (execve(path, cmd, envp))
-		put_error_message(EXIT);
+	{
+		put_error_message(1);
+		exit(127);
+	}
 }
