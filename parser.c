@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/09 22:17:40 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/27 22:58:24 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,35 @@ void	add_redirection_struct(t_token *token, char **input)
 		else
 			rd->type = OUT;
 	}
+	if (**input == '<' || **input == '>')
+
 	rd->file = get_txt(input);
 	new = ft_lstnew(rd);
 	ft_lstadd_back(&(token->rd), new);
+}
+
+void	handle_redirection_error(char **input)
+{
+	int	print_cnt;
+
+	print_cnt = 1;
+	if (**input == '<')
+	{
+		printf("syntax error near unexpected token '<");
+		(*input)++;
+		while (**input == '<' && print_cnt++ < 3)
+			printf("<");
+		printf("'\n");
+	}
+	else if (**input == '>')
+	{
+		printf("syntax error near unexpected token '>");
+		(*input)++;
+		while (**input == '>' && print_cnt++ < 2)
+			printf(">");
+		printf("'\n");
+	}
+	
+
+
 }

@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/24 22:36:43 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/27 22:58:23 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int is_builtin(t_list *cmdlst)
 	return (0);
 }
 
-void execute_builtin_command(t_token *token, t_list *e_lst)
+void execute_builtin_command(t_token *token, t_list *e_lst, int parent)
 {
 	char	**cmd;
 	int		cmdlen;
@@ -56,6 +56,8 @@ void execute_builtin_command(t_token *token, t_list *e_lst)
 	dup2(org_fd[1], STDOUT_FILENO);
 	close(org_fd[0]);
 	close(org_fd[1]);
+	if (!parent)
+		exit((int)g_exit_code);
 }
 //added checking under bar
 int is_valid_name(char *name)

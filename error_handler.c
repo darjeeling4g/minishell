@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error_handler.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 14:38:13 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 02:12:44 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/27 22:58:29 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@ void	put_error_message(int type)
 
 	errorstr = strerror(errno);
 	ft_putendl_fd(errorstr, 2);
-	if (type == EXIT)
-		exit(1);
 }
 
 void	free_array(char **arr, int idx)

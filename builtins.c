@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:06:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 00:19:34 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/27 22:58:35 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,18 +70,27 @@ void	execute_exit(t_token *token)
 
 	rd = token->rd;
 	txt = token->txt;
-	if (!rd && !txt->next)
+	if (!txt->next)
 		exit(0);
 	exitcode = (char *)txt->next->content;
 	i = -1;
+	if (exitcode[0] == '-' && exitcode[1])
+		i++;
 	while (exitcode[++i])
-	{
 		if (!ft_isdigit(exitcode[i]))
-			exit(255);
-		
+			g_exit_code = 255;
+	if (txt->next->next)
+		g_exit_code = 1;
+	else if (g_exit_code == 0)
+	{
+		g_exit_code = (unsigned char)ft_atoi(exitcode);
+		exit((int)g_exit_code);
 	}
-	if (rd || txt->next->next)
-		exit(255);
-	else
-		exit((char *)txt->next->content);
+	if (g_exit_code == 255)
+	{
+		printf("exit: %s: numeric argument required\n", exitcode);
+		exit((int)g_exit_code);
+	}
+	else if (g_exit_code == 1)
+		printf("exit: too many arguments\n");
 }
