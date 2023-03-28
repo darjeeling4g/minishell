@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/27 22:58:34 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 17:03:27 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,11 @@ void signal_handler(int sig)
 
 int main(int argc, char **argv, char **envp)
 {
-	t_list *p_lst;
-	t_list *e_lst;
-	char *input;
-	int flag;
-	struct termios termattr[2];
+	t_list			*p_lst;
+	t_list			*e_lst;
+	char			*input;
+	int				flag;
+	struct termios	termattr[2];
 
 	save_input_mode(&termattr[ORG]);
 	set_input_mode(&termattr[NEW]);
@@ -59,20 +59,22 @@ int main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	e_lst = array_to_list(envp);
-	while ((input = readline("minishell$ ")) != NULL)
+	input = readline("minishell$ ");
+	while (input != NULL)
 	{
 		if (*input)
 		{
 			flag = is_complete_command(input);
 			join_input(&input, flag);
-			p_lst = tokenizer(input);
+			p_lst = tokenizer(input, e_lst);
 			add_history(input);
 			free(input);
-			interpret_token(p_lst, e_lst);
+			interpret_token(p_lst, e_lst, &termattr[ORG]);
 		}
+		set_input_mode(&termattr[NEW]);
+		input = readline("minishell$ ");
 	}
-	reset_input_mode(&termattr[ORG]);
-	return 0;
+	return (0);
 }
 
 void join_input(char **input, int flag)
@@ -90,7 +92,6 @@ void join_input(char **input, int flag)
 		tmp = *input;
 		*input = ft_strjoin(*input, add_input);
 		flag = is_complete_command(*input);
-		printf("=>%d, %s\n", flag, *input);
 		free(tmp);
 		free(add_input);
 	}

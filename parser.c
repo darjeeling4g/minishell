@@ -6,13 +6,13 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/27 22:58:24 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 17:19:58 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_list	*tokenizer(char *input)
+t_list	*tokenizer(char *input, t_list *e_lst)
 {
 	t_list	*res;
 	t_list	*new;
@@ -25,9 +25,9 @@ t_list	*tokenizer(char *input)
 		while (*input == ' ')
 			input++;
 		if (*input == '<' || *input == '>')
-			add_redirection_struct(token, &input);
+			add_redirection_struct(token, &input, e_lst);
 		else if (*input != '|')
-			add_text_struct(token, &input);
+			add_text_struct(token, &input, e_lst);
 		else if (*input == '|')
 		{
 			new = ft_lstnew(token);
@@ -53,12 +53,12 @@ t_token	*init_token(void)
 	return (token);
 }
 
-void	add_text_struct(t_token *token, char **input)
+void	add_text_struct(t_token *token, char **input, t_list *e_lst)
 {
 	t_list	*new;
 	char	*txt;
 
-	txt = get_txt(input);
+	txt = get_txt(input, e_lst);
 	if (txt)
 	{
 		new = ft_lstnew(txt);
@@ -66,7 +66,7 @@ void	add_text_struct(t_token *token, char **input)
 	}
 }
 
-void	add_redirection_struct(t_token *token, char **input)
+void	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 {
 	t_list	*new;
 	t_rd	*rd;
@@ -97,8 +97,8 @@ void	add_redirection_struct(t_token *token, char **input)
 			rd->type = OUT;
 	}
 	if (**input == '<' || **input == '>')
-
-	rd->file = get_txt(input);
+		handle_redirection_error(input);
+	rd->file = get_txt(input, e_lst);
 	new = ft_lstnew(rd);
 	ft_lstadd_back(&(token->rd), new);
 }
@@ -112,7 +112,7 @@ void	handle_redirection_error(char **input)
 	{
 		printf("syntax error near unexpected token '<");
 		(*input)++;
-		while (**input == '<' && print_cnt++ < 3)
+		while (**input == '<' && print_cnt++ < 2)
 			printf("<");
 		printf("'\n");
 	}
@@ -124,7 +124,4 @@ void	handle_redirection_error(char **input)
 			printf(">");
 		printf("'\n");
 	}
-	
-
-
 }

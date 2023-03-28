@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   get_txt.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 12:44:24 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/24 15:14:06 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/28 17:03:19 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 //get_txt will return one string argument
-char	*get_txt(char **input)
+char	*get_txt(char **input, t_list *e_lst)
 {
 	char	*txt;
 	int		quote[3];
@@ -25,7 +25,7 @@ char	*get_txt(char **input)
 		if (**input == DQ)
 		{
 			quote[F_DQ] = UNCLOSED;
-			txt = get_changed_double_quote(input, quote, txt);
+			txt = get_changed_double_quote(input, quote, txt, e_lst);
 		}
 		else if (**input == SQ)
 		{
@@ -35,7 +35,7 @@ char	*get_txt(char **input)
 		else
 		{
 			quote[F_LT] = 1;
-			txt = get_changed_string(input, txt);
+			txt = get_changed_string(input, txt, e_lst);
 		}
 		if (**input == ' ' || **input == '|')
 			break ;
@@ -44,7 +44,7 @@ char	*get_txt(char **input)
 }
 
 //get_expanded_env will expand environment and return it
-char	*get_expanded_env(char **input, int *i)
+char	*get_expanded_env(char **input, int *i, t_list *e_lst)
 {
 	int		start;
 	char	*env;
@@ -53,25 +53,30 @@ char	*get_expanded_env(char **input, int *i)
 	if ((*input)[*i + 1] == DQ || (*input)[*i + 1] == SQ)
 		return (0);
 	start = ++(*i);
-	// if (ft_isdigit((*input)[*i]))
-	// 	return (0);
+	if ((*input)[*i] == '?')
+	{
+		(*i)++;
+		return (ft_itoa((int)g_exit_code));
+	}
 	while (ft_isalnum((*input)[*i]) || (*input)[*i] == '_')
 		(*i)++;
 	if (*i - start == 0)
-		return (0);
+	{
+		(*i)--;
+		return (ft_strdup("$"));
+	}
 	env = ft_substr(*input, start, *i - start);
-	printf("%s\n", env);
 	if (!env)
 		exit(1);
 	tmp = env;
-	env = getenv(env);
+	env = get_env(e_lst, env);
 	free (tmp);
 	(*i)--;
 	return (env);
 }
 
 //this function will change and return only literal in double quotation, and increase input pointer
-char	*get_changed_double_quote(char **input, int *quote, char *txt)
+char	*get_changed_double_quote(char **input, int *quote, char *txt, t_list *e_lst)
 {
 	int		i;
 	int		start;
@@ -88,7 +93,7 @@ char	*get_changed_double_quote(char **input, int *quote, char *txt)
 		{
 			if (i - start > 0)//previous characters are newly assigned.
 				txt = ft_substrjoin(txt, *input, start, i - start);//txt will free in ft_substrjoin.
-			env = get_expanded_env(input, &i);//index increase as length of environment name.
+			env = get_expanded_env(input, &i, e_lst);//index increase as length of environment name.
 			txt = ft_substrjoin(txt, env, 0, ft_strlen_md(env));
 			start = i + 1;//updates the index after the environment name.
 		}
@@ -122,7 +127,7 @@ char	*get_changed_single_quote(char **input, int *quote, char *txt)
 }
 
 //this function will change and return literal to space character
-char	*get_changed_string(char **input, char *txt)
+char	*get_changed_string(char **input, char *txt, t_list *e_lst)
 {
 	int		i;
 	int		start;
@@ -139,7 +144,7 @@ char	*get_changed_string(char **input, char *txt)
 		{
 			if (i - start > 0)//previous characters are newly assigned.
 				txt = ft_substrjoin(txt, *input, start, i - start);//txt will free in ft_substrjoin.
-			env = get_expanded_env(input, &i);
+			env = get_expanded_env(input, &i, e_lst);
 			txt = ft_substrjoin(txt, env, 0, ft_strlen_md(env));
 			start = i + 1;//updates the index after the environment name.
 		}

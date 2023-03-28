@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 18:10:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/10 02:39:52 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/28 14:59:23 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,20 +25,6 @@ char	*ft_substrjoin(char *s1, char *s2, unsigned int s2_start, size_t s2_len)
 	free (sub_str);
 	return (str);
 }
-
-// size_t	ft_strlen_md(const char *s)
-// {
-// 	size_t	i;
-
-// 	i = 0;
-// 	if (!s)
-// 		return (0);
-// 	while (s[i])
-// 	{
-// 		i++;
-// 	}
-// 	return (i);
-// }
 
 char	**list_to_array(t_list *lst)
 {
@@ -74,7 +60,7 @@ t_list	*array_to_list(char **arr)
 	{
 		str = ft_strdup(*arr);
 		if (!str)
-			put_error_message(EXIT);
+			put_error_message(1, NULL);
 		new = ft_lstnew(str);
 		ft_lstadd_back(&res, new);
 		arr++;

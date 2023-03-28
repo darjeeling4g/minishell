@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/27 22:58:23 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 16:55:18 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,29 +33,31 @@ void execute_builtin_command(t_token *token, t_list *e_lst, int parent)
 {
 	char	**cmd;
 	int		cmdlen;
-	int		org_fd[2];
+	int		std[2];
 
-	org_fd[0] = dup(STDIN_FILENO);
-	org_fd[1] = dup(STDOUT_FILENO);
-	redirection(token->rd, 0);
-	cmd = list_to_array(token->txt);
-	cmdlen = ft_strlen(*cmd);
-	if (ft_strncmp("echo", *cmd, cmdlen) == 0)
-		execute_echo(cmd);
-	else if (ft_strncmp("cd", *cmd, cmdlen) == 0)
-		execute_cd(cmd, e_lst);
-	else if (ft_strncmp("export", *cmd, cmdlen) == 0)
-		execute_export(cmd, e_lst);
-	else if (ft_strncmp("unset", *cmd, cmdlen) == 0)
-		execute_unset(cmd, e_lst);
-	else if (ft_strncmp("env", *cmd, cmdlen) == 0)
-		execute_env(e_lst);
-	else
-		execute_exit(token);
-	dup2(org_fd[0], STDIN_FILENO);
-	dup2(org_fd[1], STDOUT_FILENO);
-	close(org_fd[0]);
-	close(org_fd[1]);
+	std[0] = dup(STDIN_FILENO);
+	std[1] = dup(STDOUT_FILENO);
+	if (!redirection(token->rd, std))
+	{
+		cmd = list_to_array(token->txt);
+		cmdlen = ft_strlen(*cmd);
+		if (ft_strncmp("echo", *cmd, cmdlen) == 0)
+			execute_echo(cmd);
+		else if (ft_strncmp("cd", *cmd, cmdlen) == 0)
+			execute_cd(cmd, e_lst);
+		else if (ft_strncmp("export", *cmd, cmdlen) == 0)
+			execute_export(cmd, e_lst);
+		else if (ft_strncmp("unset", *cmd, cmdlen) == 0)
+			execute_unset(cmd, e_lst);
+		else if (ft_strncmp("env", *cmd, cmdlen) == 0)
+			execute_env(e_lst);
+		else
+			execute_exit(token);
+	}
+	dup2(std[0], STDIN_FILENO);
+	dup2(std[1], STDOUT_FILENO);
+	close(std[0]);
+	close(std[1]);
 	if (!parent)
 		exit((int)g_exit_code);
 }

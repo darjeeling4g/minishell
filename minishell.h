@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/24 19:19:53 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/28 17:05:59 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "libft.h"
@@ -32,10 +33,14 @@
 #define DQ '\"'
 #define CLOSED 0
 #define UNCLOSED 1
-#define EXIT 0
-#define CONT 1
 #define ORG 0
 #define NEW 1
+#define CHILD 0
+#define PARENT 1
+#define SUCCESS 0
+#define FAIL -1
+
+extern unsigned char	g_exit_code;
 
 typedef struct s_token
 {
@@ -57,6 +62,9 @@ typedef enum e_quote
 } t_quote;
 
 // minishell.c
+void save_input_mode(struct termios *org_term);
+void set_input_mode(struct termios *new_term);
+void reset_input_mode(struct termios *org_term);
 void join_input(char **input, int flag);
 int is_complete_command(char *input);
 
@@ -67,36 +75,39 @@ char **list_to_array(t_list *lst);
 t_list *array_to_list(char **arr);
 
 // parser.c
-t_list *tokenizer(char *input);
-t_token *init_token(void);
-void add_text_struct(t_token *token, char **input);
-void add_redirection_struct(t_token *token, char **input);
+t_list	*tokenizer(char *input, t_list *e_lst);
+t_token	*init_token(void);
+void	add_text_struct(t_token *token, char **input, t_list *e_lst);
+void	add_redirection_struct(t_token *token, char **input, t_list *e_lst);
+void	handle_redirection_error(char **input);
 
 // get_txt.c
-char *get_txt(char **input);
-char *get_expanded_env(char **input, int *i);
-char *get_changed_double_quote(char **input, int *quote, char *txt);
-char *get_changed_single_quote(char **input, int *quote, char *txt);
-char *get_changed_string(char **input, char *txt);
+char	*get_txt(char **input, t_list *e_lst);
+char	*get_expanded_env(char **input, int *i, t_list *e_lst);
+char	*get_changed_double_quote(char **input, int *quote, char *txt, t_list *e_lst);
+char	*get_changed_single_quote(char **input, int *quote, char *txt);
+char	*get_changed_string(char **input, char *txt, t_list *e_lst);
 
 // error_handler.c
-void put_error_message(int type);
-void free_array(char **arr, int idx);
+int		put_error_message(unsigned char code, char *cmd);
+int		put_customized_error_message(unsigned char code, char *cmd, char *custom);
+void	free_array(char **arr, int idx);
 
 // execute.c
-void interpret_token(t_list *tokens, t_list *e_lst);
-void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst);
-void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst);
+void interpret_token(t_list *tokens, t_list *e_lst, struct termios *termattr);
+void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst, struct termios *termattr);
+void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst, struct termios *termattr);
 
 // execute_utils.c
-char *get_env(t_list *e_lst, const char *name);
-char *find_bin(char *arg, char **envp);
-void redirection(t_list *rds, int fd);
-void get_here_doc_input(t_rd *rd, int infd);
+char	*get_env(t_list *e_lst, const char *name);
+char	*find_bin(char *arg, char **envp);
+int		redirection(t_list *rds, int std[2]);
+int		is_vaild_file(char *filename);
+void	get_here_doc_input(t_rd *rd, int std[2]);
 
 // check_builtin.c
 int is_builtin(t_list *cmdlst);
-void execute_builtin_command(t_token *token, t_list *e_lst);
+void execute_builtin_command(t_token *token, t_list *e_lst, int parent);
 int is_valid_name(char *name);
 
 // builtins.c

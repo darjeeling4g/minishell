@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: danpark <danpark@student.42.fr>            +#+  +:+       +#+         #
+#    By: siyang <siyang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 18:47:25 by danpark           #+#    #+#              #
-#    Updated: 2023/03/24 19:30:10 by danpark          ###   ########.fr        #
+#    Updated: 2023/03/28 14:48:52 by siyang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,8 +17,8 @@ CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
 OBJS_M = ${SRCS_M:.c=.o}
 NAME = minishell
-CPPFLAGS = -I libft -I ~/goinfre/.brew/opt/readline/include -I /opt/homebrew/Cellar/readline/8.2.1/include
-LDFLAGS = -L libft -L ~/goinfre/.brew/opt/readline/lib -L /opt/homebrew/Cellar/readline/8.2.1/lib
+CPPFLAGS = -I libft -I ~/goinfre/.brew/opt/readline/include
+LDFLAGS = -L libft -L ~/goinfre/.brew/opt/readline/lib
 LDLIBS = -lft -lreadline -lncurses
 
 all = $(NAME)

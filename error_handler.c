@@ -6,18 +6,41 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 14:38:13 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/27 22:58:29 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 15:53:59 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	put_error_message(int type)
+int	put_error_message(unsigned char code, char *cmd)
 {
-	char	*errorstr;
+	g_exit_code = code;
+	if (cmd)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		perror(cmd);
+	}
+	else
+		perror("minishell");
+	return (-1);
+}
 
-	errorstr = strerror(errno);
-	ft_putendl_fd(errorstr, 2);
+int	put_customized_error_message(unsigned char code, char *cmd, char *custom)
+{
+	g_exit_code = code;
+	if (cmd)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": ", 2);
+		ft_putendl_fd(custom, 2);
+	}
+	else
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putendl_fd(custom, 2);
+	}
+	return (-1);
 }
 
 void	free_array(char **arr, int idx)
@@ -26,14 +49,10 @@ void	free_array(char **arr, int idx)
 
 	i = -1;
 	if (idx == -1)
-	{
 		while (arr[++i])
 			free(arr[i]);
-	}
 	else
-	{
 		while (++i < idx)
 			free(arr[i]);
-	}
 	free(arr);
 }
