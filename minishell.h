@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 17:05:59 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 23:45:17 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,7 @@ typedef enum e_quote
 } t_quote;
 
 // minishell.c
-void save_input_mode(struct termios *org_term);
-void set_input_mode(struct termios *new_term);
-void reset_input_mode(struct termios *org_term);
+void set_input_mode(int flag);
 void join_input(char **input, int flag);
 int is_complete_command(char *input);
 
@@ -83,7 +81,7 @@ void	handle_redirection_error(char **input);
 
 // get_txt.c
 char	*get_txt(char **input, t_list *e_lst);
-char	*get_expanded_env(char **input, int *i, t_list *e_lst);
+char	*get_expanded_env(char **input, int *i, t_list *e_lst, int plain);
 char	*get_changed_double_quote(char **input, int *quote, char *txt, t_list *e_lst);
 char	*get_changed_single_quote(char **input, int *quote, char *txt);
 char	*get_changed_string(char **input, char *txt, t_list *e_lst);
@@ -94,9 +92,9 @@ int		put_customized_error_message(unsigned char code, char *cmd, char *custom);
 void	free_array(char **arr, int idx);
 
 // execute.c
-void interpret_token(t_list *tokens, t_list *e_lst, struct termios *termattr);
-void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst, struct termios *termattr);
-void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst, struct termios *termattr);
+void interpret_token(t_list *tokens, t_list *e_lst);
+void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst);
+void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst);
 
 // execute_utils.c
 char	*get_env(t_list *e_lst, const char *name);

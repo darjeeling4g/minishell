@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 17:03:27 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 23:26:36 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,21 @@
 
 unsigned char	g_exit_code = 0;
 
-void save_input_mode(struct termios *org_term)
+void set_input_mode(int flag)
 {
-	tcgetattr(STDOUT_FILENO, org_term);
-}
+	struct termios	termattr;
 
-void set_input_mode(struct termios *new_term)
-{
-	tcgetattr(STDOUT_FILENO, new_term);
-	new_term->c_lflag &= ~(ICANON | ECHOCTL);
-	// new_term->c_cc[VMIN] = 1;
-	// new_term->c_cc[VTIME] = 0;
-	tcsetattr(STDOUT_FILENO, TCSANOW, new_term);
-}
-
-void reset_input_mode(struct termios *org_term)
-{
-	tcsetattr(STDOUT_FILENO, TCSANOW, org_term);
+	tcgetattr(STDOUT_FILENO, &termattr);
+	if (flag == PARENT)
+		termattr.c_lflag &= ~ECHOCTL;
+	else
+		termattr.c_lflag |= ECHOCTL;
+	tcsetattr(STDOUT_FILENO, TCSANOW, &termattr);
 }
 
 void signal_handler(int sig)
 {
+	g_exit_code = 1;
 	if (sig == SIGINT)
 	{
 		printf("\n");
@@ -50,10 +44,8 @@ int main(int argc, char **argv, char **envp)
 	t_list			*e_lst;
 	char			*input;
 	int				flag;
-	struct termios	termattr[2];
 
-	save_input_mode(&termattr[ORG]);
-	set_input_mode(&termattr[NEW]);
+	set_input_mode(PARENT);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
 	(void)argc;
@@ -62,6 +54,7 @@ int main(int argc, char **argv, char **envp)
 	input = readline("minishell$ ");
 	while (input != NULL)
 	{
+		signal(SIGINT, SIG_IGN);
 		if (*input)
 		{
 			flag = is_complete_command(input);
@@ -69,13 +62,17 @@ int main(int argc, char **argv, char **envp)
 			p_lst = tokenizer(input, e_lst);
 			add_history(input);
 			free(input);
-			interpret_token(p_lst, e_lst, &termattr[ORG]);
+			// if (check_token_syntax())
+				interpret_token(p_lst, e_lst);
 		}
-		set_input_mode(&termattr[NEW]);
+		set_input_mode(PARENT);
+		signal(SIGINT, signal_handler);
 		input = readline("minishell$ ");
 	}
 	return (0);
 }
+
+// int	check_token_sy
 
 void join_input(char **input, int flag)
 {

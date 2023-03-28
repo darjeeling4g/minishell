@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 12:44:24 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 17:03:19 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 23:46:57 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,20 +44,17 @@ char	*get_txt(char **input, t_list *e_lst)
 }
 
 //get_expanded_env will expand environment and return it
-char	*get_expanded_env(char **input, int *i, t_list *e_lst)
+char	*get_expanded_env(char **input, int *i, t_list *e_lst, int plain)
 {
 	int		start;
 	char	*env;
 	char	*tmp;
 
-	if ((*input)[*i + 1] == DQ || (*input)[*i + 1] == SQ)
+	if (plain && ((*input)[*i + 1] == DQ || (*input)[*i + 1] == SQ))
 		return (0);
 	start = ++(*i);
 	if ((*input)[*i] == '?')
-	{
-		(*i)++;
 		return (ft_itoa((int)g_exit_code));
-	}
 	while (ft_isalnum((*input)[*i]) || (*input)[*i] == '_')
 		(*i)++;
 	if (*i - start == 0)
@@ -93,7 +90,7 @@ char	*get_changed_double_quote(char **input, int *quote, char *txt, t_list *e_ls
 		{
 			if (i - start > 0)//previous characters are newly assigned.
 				txt = ft_substrjoin(txt, *input, start, i - start);//txt will free in ft_substrjoin.
-			env = get_expanded_env(input, &i, e_lst);//index increase as length of environment name.
+			env = get_expanded_env(input, &i, e_lst, 0);//index increase as length of environment name.
 			txt = ft_substrjoin(txt, env, 0, ft_strlen_md(env));
 			start = i + 1;//updates the index after the environment name.
 		}
@@ -144,7 +141,7 @@ char	*get_changed_string(char **input, char *txt, t_list *e_lst)
 		{
 			if (i - start > 0)//previous characters are newly assigned.
 				txt = ft_substrjoin(txt, *input, start, i - start);//txt will free in ft_substrjoin.
-			env = get_expanded_env(input, &i, e_lst);
+			env = get_expanded_env(input, &i, e_lst, 1);
 			txt = ft_substrjoin(txt, env, 0, ft_strlen_md(env));
 			start = i + 1;//updates the index after the environment name.
 		}

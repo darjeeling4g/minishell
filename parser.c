@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 17:19:58 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 01:09:27 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,11 @@ void	handle_redirection_error(char **input)
 {
 	int	print_cnt;
 
+	// if (!filename)
+	// {
+	// 	put_customized_error_message(2, 0, "syntax error near unexpected token `newline'");
+	// 	return (0);
+	// }
 	print_cnt = 1;
 	if (**input == '<')
 	{

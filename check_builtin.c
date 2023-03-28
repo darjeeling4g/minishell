@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 16:55:18 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 01:17:57 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,12 @@ int is_valid_name(char *name)
 	int res;
 
 	res = 1;
-	if (!ft_isalpha(*name) || *name != '_')
+	if ((ft_isalpha(*name) || *name == '_') == FALSE)
 		res = 0;
 	name++;
 	while (*name)
 	{
-		if (!ft_isalnum(*name) || *name != '_')
+		if ((ft_isalnum(*name) || *name == '_') == FALSE)
 			res = 0;
 		name++;
 	}

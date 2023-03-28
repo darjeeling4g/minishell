@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 17:19:56 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/28 23:22:47 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,6 @@
 
 int	is_vaild_file(char *filename)
 {
-	if (!filename)
-	{
-		put_customized_error_message(2, 0, "syntax error near unexpected token `newline'");
-		return (0);
-	}
 	if (access(filename, F_OK) == FAIL)
 	{
 		put_error_message(2, filename);
@@ -141,5 +136,5 @@ char *find_bin(char *arg, char **envp)
 		i++;
 	}
 	free(path_group);
-	return (0);
+	return (arg);
 }

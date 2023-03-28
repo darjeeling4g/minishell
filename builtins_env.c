@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_env.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/22 20:49:27 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 01:26:19 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ void	print_sorted_envp(t_list *e_lst)
 	char	*tmp;
 	int		i;
 	int		j;
+	int		k;
 
 	arr = list_to_array(e_lst);
 	i = -1;
@@ -100,17 +101,28 @@ void	print_sorted_envp(t_list *e_lst)
 		j = i;
 		while (arr[++j])
 		{
-			if (ft_strncmp(arr[i], arr[j], 1) > 0)
+			k = 0;
+			while (arr[i][k] != '=' && arr[j][k] != '=')
 			{
-				tmp = arr[i];
-				arr[i] = arr[j];
-				arr[j] = tmp;
+				if (((arr[i][k] - arr[j][k]) > 0) || ((arr[i][k] == arr[j][k]) && (arr[j][k + 1] == '=')))
+				{
+					tmp = arr[i];
+					arr[i] = arr[j];
+					arr[j] = tmp;
+					break ;
+				}
+				else if ((arr[i][k] - arr[j][k]) < 0)
+					break ;
+				k++;
 			}
 		}
 	}
 	i = -1;
 	while (arr[++i])
-		printf("declare -x %s\n", arr[i]);
+	{
+		if (ft_strncmp("_=", arr[i], 2))
+			printf("declare -x %s\n", arr[i]);
+	}
 	free_array(arr, -1);
 }
 
