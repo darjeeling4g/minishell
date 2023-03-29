@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:06:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 05:38:32 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 05:47:26 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	execute_echo(char **cmd)
 	if (!*cmd)
 	{
 		printf("\n");
+		g_exit_code = 0;
 		return ;
 	}
 	if (ft_strlen(*cmd) == ft_strlen("-n") && \
@@ -38,6 +39,7 @@ void	execute_echo(char **cmd)
 		else if (!option)
 			printf("\n");
 	}
+	g_exit_code = 0;
 }
 
 void	execute_cd(char **cmd, t_list *e_lst)
@@ -84,6 +86,7 @@ void	execute_cd(char **cmd, t_list *e_lst)
 			pwd->next->content = ft_strjoin("PWD=", tmp);
 			free(tmp);
 		}
+		g_exit_code = 0;
 	}
 	else
 		put_error_message(1, *cmd);
@@ -97,6 +100,7 @@ void	execute_pwd(void)
 	if (pwd != NULL)
 		printf("%s\n", pwd);
 	free(pwd);
+	g_exit_code = 0;
 }
 
 void	execute_exit(t_token *token)
@@ -109,7 +113,10 @@ void	execute_exit(t_token *token)
 	rd = token->rd;
 	txt = token->txt;
 	if (!txt->next)
+	{
+		g_exit_code = 0;
 		exit(0);
+	}
 	exitcode = (char *)txt->next->content;
 	i = -1;
 	if (exitcode[0] == '+' && exitcode[0] == '-' && exitcode[1])

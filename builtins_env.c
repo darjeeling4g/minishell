@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 05:07:33 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 06:08:42 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	execute_env(t_list *e_lst)
 			printf("%s\n", env);
 		e_lst = e_lst->next;
 	}
+	g_exit_code = 0;
 }
 
 void	execute_export(char **cmd, t_list *e_lst)
@@ -46,8 +47,8 @@ void	execute_export(char **cmd, t_list *e_lst)
 				put_customized_error_message(1, *cmd, "not a valid identifier");
 				return ;
 			}
-			free_array(env, -1);
 			tmp = get_env_node(env[0], e_lst);
+			free_array(env, -1);
 			str = ft_strdup(*cmd);
 			if (!str)
 				exit(1);
@@ -66,6 +67,7 @@ void	execute_export(char **cmd, t_list *e_lst)
 			cmd++;
 		}
 	}
+	g_exit_code = 0;
 }
 
 void	execute_unset(char **cmd, t_list *e_lst)
@@ -84,7 +86,7 @@ void	execute_unset(char **cmd, t_list *e_lst)
 		env = get_env_node(*cmd, e_lst);
 		if (env)
 		{
-			if (!ft_strncmp(env->content, "_=", 2))
+			if (ft_strncmp(env->content, "_=", 2))
 			{
 				tmp = env->next;
 				env->next = env->next->next;
@@ -94,6 +96,7 @@ void	execute_unset(char **cmd, t_list *e_lst)
 		}
 		cmd++;
 	}
+	g_exit_code = 0;
 }
 
 void	sort_n_print(t_list *e_lst)
