@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/29 16:07:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 04:29:31 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 04:57:03 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,17 @@ int	is_valid_filename(char *input)
 	{
 		msg = ft_strdup("syntax error near unexpected token `<");
 		if (*(input + 1) == '<')
-			msg = ft_substrjoin(msg, ft_strdup("<"), 0, 1);
+			msg = ft_substrjoin(msg, "<", 0, 1);
 	}
 	else if (*input == '>')
 	{
 		msg = ft_strdup("syntax error near unexpected token `>");
 		if (*(input + 1) == '>')
-			msg = ft_substrjoin(msg, ft_strdup(">"), 0, 1);
+			msg = ft_substrjoin(msg, ">", 0, 1);
 	}
 	if (msg)
 	{
-		msg = ft_substrjoin(msg, ft_strdup("'"), 0 ,1);
+		msg = ft_substrjoin(msg, "'", 0 ,1);
 		put_customized_error_message(2, NULL, msg);
 		return (FALSE);
 	}
@@ -64,7 +64,7 @@ int	check_token_syntax(t_list *tokens)
 		}
 		if (tokens->next)
 		{
-			if (token->txt == NULL || flag == 1)
+			if (flag == 1 || (!token->txt && !token->rd))
 			{
 				put_customized_error_message(2, NULL,
 					"syntax error near unexpected token `|'");

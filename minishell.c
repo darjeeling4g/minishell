@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 04:29:49 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 05:12:03 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ int main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	e_lst = array_to_list(envp);
+	ft_lstadd_back(&e_lst, ft_lstnew(ft_strdup("OLDPWD")));
 	input = readline("minishell$ ");
 	while (input != NULL)
 	{

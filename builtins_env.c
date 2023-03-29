@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 19:33:31 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 05:07:33 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	execute_env(t_list *e_lst)
 	}
 }
 
-void	execute_export(char	**cmd, t_list *e_lst)
+void	execute_export(char **cmd, t_list *e_lst)
 {
 	t_list	*new;
 	t_list	*tmp;
