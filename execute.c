@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 14:38:51by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 02:40:04 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void interpret_token(t_list *tokens, t_list *e_lst)
 	t_token *token;
 
 	token = (t_token *)tokens->content;
+	get_here_doc_input(token->rd);
 	if (token->txt && ft_lstsize(tokens) == 1 && is_builtin(token->txt))
 		execute_builtin_command(token, e_lst, PARENT);
 	else
@@ -29,7 +30,10 @@ void interpret_token(t_list *tokens, t_list *e_lst)
 		if (pid == -1)
 			exit(1);
 		else if (pid != 0)
+		{
+			close_here_doc_pipe(token->rd);
 			parent_do(tokens, pid, fds, e_lst);
+		}
 		else
 			execute_command(tokens, fds, 1, e_lst);
 	}
@@ -37,9 +41,10 @@ void interpret_token(t_list *tokens, t_list *e_lst)
 
 void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 {
-	int stat;
-	char sig_code;
-	t_list *tmp;
+	int		stat;
+	char	sig_code;
+	t_list	*tmp;
+	t_token	*token;
 
 	close(fds[0][1]);
 	tmp = tokens;
@@ -48,6 +53,8 @@ void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 	{
 		if (pipe(fds[1]) == -1)
 			exit(1);
+		token = (t_token *)tokens->content;
+		get_here_doc_input(token->rd);
 		pid = fork();
 		if (pid == -1)
 			exit(1);
@@ -56,6 +63,7 @@ void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 		dup2(fds[1][0], fds[0][0]);
 		close(fds[1][0]);
 		close(fds[1][1]);
+		close_here_doc_pipe(token->rd);
 		tokens = tokens->next;
 	}
 	while (tmp)
@@ -79,12 +87,9 @@ void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 	char **envp;
 	char **cmd;
 	char *path;
-	int std[2];
 
 	signal(SIGINT, SIG_DFL);
 	token = (t_token *)tokens->content;
-	std[0] = dup(STDIN_FILENO);
-	std[1] = dup(STDOUT_FILENO);
 	if (first)
 	{
 		if (tokens->next)
@@ -100,7 +105,7 @@ void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 		close(fds[1][1]);
 	}
 	close(fds[0][0]);
-	if (redirection(token->rd, std) == -1)
+	if (redirection(token->rd) == -1)
 		exit(g_exit_code);
 	cmd = list_to_array(token->txt);
 	if (cmd == NULL)

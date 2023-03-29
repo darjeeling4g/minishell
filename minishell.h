@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 22:44:47 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 02:44:55 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,9 @@ typedef struct s_token
 
 typedef struct s_rd
 {
-	int type;
-	char *file;
+	int		type;
+	char	*file;
+	int		read;
 } t_rd;
 
 typedef enum e_quote
@@ -94,21 +95,22 @@ void	free_token_list(t_list *tokens);
 void	delete_list_content(void *content);
 
 // execute.c
-void interpret_token(t_list *tokens, t_list *e_lst);
-void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst);
-void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst);
+void	interpret_token(t_list *tokens, t_list *e_lst);
+void	parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst);
+void	execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst);
 
 // execute_utils.c
 char	*get_env(t_list *e_lst, const char *name);
 char	*find_bin(char *arg, char **envp);
-int		redirection(t_list *rds, int std[2]);
+int		redirection(t_list *rds);
 int		is_vaild_file(char *filename);
-void	get_here_doc_input(t_rd *rd, int std[2]);
+void	get_here_doc_input(t_list *rds);
+void	close_here_doc_pipe(t_list *rds);
 
 // check_builtin.c
-int is_builtin(t_list *cmdlst);
-void execute_builtin_command(t_token *token, t_list *e_lst, int parent);
-int is_valid_name(char *name);
+int		is_builtin(t_list *cmdlst);
+void	execute_builtin_command(t_token *token, t_list *e_lst, int parent);
+int		is_valid_name(char *name);
 
 // builtins.c
 void	execute_echo(char **cmd);

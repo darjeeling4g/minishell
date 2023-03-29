@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 22:45:24 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 02:44:14 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void execute_builtin_command(t_token *token, t_list *e_lst, int parent)
 
 	std[0] = dup(STDIN_FILENO);
 	std[1] = dup(STDOUT_FILENO);
-	if (!redirection(token->rd, std))
+	if (!redirection(token->rd))
 	{
 		cmd = list_to_array(token->txt);
 		cmdlen = ft_strlen(*cmd);

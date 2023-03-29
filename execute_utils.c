@@ -6,7 +6,7 @@
 /*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 23:22:47 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 02:54:02 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	is_vaild_file(char *filename)
 	return (1);
 }
 
-int	redirection(t_list *rds, int std[2])
+int	redirection(t_list *rds)
 {
 	t_rd *rd;
 	int file;
@@ -46,7 +46,10 @@ int	redirection(t_list *rds, int std[2])
 			close(file);
 		}
 		else if (rd->type == HRDC)
-			get_here_doc_input(rd, std);
+		{
+			dup2(rd->read, STDIN_FILENO);
+			close(rd->read);
+		}
 		else
 		{
 			if (rd->type == OUT)
@@ -63,34 +66,52 @@ int	redirection(t_list *rds, int std[2])
 	return (0);
 }
 
-void get_here_doc_input(t_rd *rd, int std[2])
+void get_here_doc_input(t_list *rds)
 {
-	char *input;
-	char *rd_line;
-	size_t rd_len;
-	size_t lmt_len;
-	int fds[2];
+	char	*input;
+	char	*rd_line;
+	size_t	rd_len;
+	size_t	lmt_len;
+	int		fds[2];
+	t_rd	*rd;
 
-	if (pipe(fds) == -1)
-		exit(1);
-	input = 0;
-	lmt_len = ft_strlen(rd->file);
-	while (1)
+	while (rds)
 	{
-		write(std[1], "> ", 3);
-		rd_line = get_next_line(std[0]);
-		if (!rd_line)
-			break;
-		rd_len = ft_strlen(rd_line) - 1;
-		if (lmt_len == rd_len && ft_strncmp(rd->file, rd_line, rd_len) == 0)
-			break;
-		input = ft_substrjoin(input, rd_line, 0, ft_strlen(rd_line));
-		free(rd_line);
+		rd = (t_rd *)rds->content;
+		if (pipe(fds) == -1)
+			exit(1);
+		input = ft_strdup("");
+		lmt_len = ft_strlen(rd->file);
+		while (1)
+		{
+			write(1, "> ", 3);
+			rd_line = get_next_line(0);
+			if (!rd_line)
+				break;
+			rd_len = ft_strlen(rd_line) - 1;
+			if (lmt_len == rd_len && ft_strncmp(rd->file, rd_line, rd_len) == 0)
+				break;
+			input = ft_substrjoin(input, rd_line, 0, ft_strlen(rd_line));
+			free(rd_line);
+		}
+		write(fds[1], input, ft_strlen(input));
+		free(input);
+		rd->read = fds[0];
+		rds = rds->next;
 	}
-	write(fds[1], input, ft_strlen(input));
-	dup2(fds[0], STDIN_FILENO);
-	close(fds[0]);
 	close(fds[1]);
+}
+
+void	close_here_doc_pipe(t_list *rds)
+{
+	t_rd	*rd;
+
+	while(rds)
+	{
+		rd = (t_rd *)rds->content;
+		close(rd->read);
+		rds = rds->next;
+	}
 }
 
 char *get_env(t_list *e_lst, const char *name)
