@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 03:55:58 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 04:29:49 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ int main(int argc, char **argv, char **envp)
 			tokens = tokenizer(input, e_lst);
 			add_history(input);
 			free(input);
-			// if (check_token_syntax())
 			if (tokens != NULL)
-				interpret_token(tokens, e_lst);
+				if (check_token_syntax(tokens) == TRUE)
+					interpret_token(tokens, e_lst);
 		}
 		set_input_mode(PARENT);
 		signal(SIGINT, signal_handler);

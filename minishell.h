@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 03:35:22 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 04:08:01 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,10 +128,11 @@ t_list *get_env_node(char *name, t_list *e_lst);
 
 // check_syntax_error.c
 int	is_valid_filename(char *input);
+int	check_token_syntax(t_list *tokens);
 
-int		count_contained_redirection(char *str);
-int		is_valid_redirection_token_syntax(char *str);
-void	put_redirection_syntax_error_message(char *str);
-char	*get_syntax_error_message(char *str);
+//int		count_contained_redirection(char *str);
+//int		is_valid_redirection_token_syntax(char *str);
+//void	put_redirection_syntax_error_message(char *str);
+//char	*get_syntax_error_message(char *str);
 
 #endif

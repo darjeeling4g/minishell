@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/29 16:07:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 03:55:45 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 04:29:31 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,26 +22,64 @@ int	is_valid_filename(char *input)
 	if (*input == '<')
 	{
 		msg = ft_strdup("syntax error near unexpected token `<");
-		input++;
-		if (*input == '<')
+		if (*(input + 1) == '<')
 			msg = ft_substrjoin(msg, ft_strdup("<"), 0, 1);
-		msg  = ft_substrjoin(msg, ft_strdup("'"), 0 ,1);
 	}
 	else if (*input == '>')
 	{
 		msg = ft_strdup("syntax error near unexpected token `>");
-		input++;
-		if (*input == '>')
+		if (*(input + 1) == '>')
 			msg = ft_substrjoin(msg, ft_strdup(">"), 0, 1);
-		msg  = ft_substrjoin(msg, ft_strdup("'"), 0 ,1);
 	}
 	if (msg)
 	{
+		msg = ft_substrjoin(msg, ft_strdup("'"), 0 ,1);
 		put_customized_error_message(2, NULL, msg);
 		return (FALSE);
 	}
-	else
-		return (TRUE);
+	return (TRUE);
+}
+
+int	check_token_syntax(t_list *tokens)
+{
+	t_token	*token;
+	t_list	*rds;
+	t_rd	*rd;
+	int		flag;
+
+	while (tokens)
+	{
+		flag = 0;
+		token = (t_token *)tokens->content;
+		rds = token->rd;
+		while (rds)
+		{
+			rd = (t_rd *)rds->content;
+			if (rd->file == NULL)
+			{
+				flag = 1;
+				break ;
+			}
+			rds = rds->next;
+		}
+		if (tokens->next)
+		{
+			if (token->txt == NULL || flag == 1)
+			{
+				put_customized_error_message(2, NULL,
+					"syntax error near unexpected token `|'");
+				return (FALSE);
+			}
+		}
+		else if (flag == 1)
+		{
+			put_customized_error_message(2, NULL,
+				"syntax error near unexpected token `newline'");
+			return (FALSE);
+		}
+		tokens = tokens->next;
+	}
+	return (TRUE);
 }
 
 //int	is_valid_redirection_token_syntax(char *str)
