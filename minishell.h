@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 23:45:17 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 20:19:04 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ t_list *array_to_list(char **arr);
 t_list	*tokenizer(char *input, t_list *e_lst);
 t_token	*init_token(void);
 void	add_text_struct(t_token *token, char **input, t_list *e_lst);
-void	add_redirection_struct(t_token *token, char **input, t_list *e_lst);
+int		add_redirection_struct(t_token *token, char **input, t_list *e_lst);
 void	handle_redirection_error(char **input);
 
 // get_txt.c
@@ -90,6 +90,8 @@ char	*get_changed_string(char **input, char *txt, t_list *e_lst);
 int		put_error_message(unsigned char code, char *cmd);
 int		put_customized_error_message(unsigned char code, char *cmd, char *custom);
 void	free_array(char **arr, int idx);
+void	free_token_list(t_list *tokens);
+void	delete_list_content(void *content);
 
 // execute.c
 void interpret_token(t_list *tokens, t_list *e_lst);
@@ -109,16 +111,22 @@ void execute_builtin_command(t_token *token, t_list *e_lst, int parent);
 int is_valid_name(char *name);
 
 // builtins.c
-int		execute_echo(char **cmd);
-int 	execute_cd(char **cmd, t_list *e_lst);
-int 	execute_pwd(t_list *e_lst);
+void	execute_echo(char **cmd);
+void	execute_cd(char **cmd, t_list *e_lst);
+void	execute_pwd(t_list *e_lst);
 void	execute_exit(t_token *token);
 
 // builtins_env.c
-int execute_env(t_list *e_lst);
-int execute_export(char **cmd, t_list *e_lst);
-int execute_unset(char **cmd, t_list *e_lst);
-void print_sorted_envp(t_list *e_lst);
+void	execute_env(t_list *e_lst);
+void	execute_export(char **cmd, t_list *e_lst);
+void	execute_unset(char **cmd, t_list *e_lst);
+void	sort_n_print(t_list *e_lst);
+void	print_sorted_envp(char **arr);
 t_list *get_env_node(char *name, t_list *e_lst);
+
+// check_syntax_error.c
+int		count_contained_redirection(char *str);
+int		is_valid_redirection_token_syntax(char *str);
+void	put_redirection_syntax_error_message(char *str);
 
 #endif

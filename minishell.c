@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 23:26:36 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 18:13:41 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void signal_handler(int sig)
 
 int main(int argc, char **argv, char **envp)
 {
-	t_list			*p_lst;
+	t_list			*tokens;
 	t_list			*e_lst;
 	char			*input;
 	int				flag;
@@ -59,11 +59,12 @@ int main(int argc, char **argv, char **envp)
 		{
 			flag = is_complete_command(input);
 			join_input(&input, flag);
-			p_lst = tokenizer(input, e_lst);
+			tokens = tokenizer(input, e_lst);
 			add_history(input);
 			free(input);
 			// if (check_token_syntax())
-				interpret_token(p_lst, e_lst);
+			if (tokens != NULL)
+				interpret_token(tokens, e_lst);
 		}
 		set_input_mode(PARENT);
 		signal(SIGINT, signal_handler);
@@ -72,7 +73,6 @@ int main(int argc, char **argv, char **envp)
 	return (0);
 }
 
-// int	check_token_sy
 
 void join_input(char **input, int flag)
 {

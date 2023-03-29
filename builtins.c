@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:06:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 02:14:45 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 21:17:03 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	execute_echo(char **cmd)
+void	execute_echo(char **cmd)
 {
 	int	option;
 
@@ -21,7 +21,7 @@ int	execute_echo(char **cmd)
 	if (!*cmd)
 	{
 		printf("\n");
-		return(0);
+		return ;
 	}
 	if (ft_strlen(*cmd) == ft_strlen("-n") && \
 	ft_strncmp("-n", *cmd, ft_strlen(*cmd)) == 0)
@@ -38,27 +38,51 @@ int	execute_echo(char **cmd)
 		else if (!option)
 			printf("\n");
 	}
-	return(0);
 }
 
-int	execute_cd(char **cmd, t_list *e_lst)
+void	execute_cd(char **cmd, t_list *e_lst)
 {
+	t_list	*old_pwd;
+	t_list	*pwd;
+	char	*path;
+	char	*tmp;
+
 	cmd++;
+	printf("%s\n", *cmd);
 	if (!(*cmd) || !ft_strncmp("~", *cmd, ft_strlen(*cmd)))
-		return (chdir(get_env(e_lst, "HOME")));
-	return (chdir(*cmd));
+	{
+		path = get_env(e_lst, "HOME");
+		if (!path)
+		{
+			put_customized_error_message(1, *(cmd - 1), "HOME not set");
+			return ;
+		}
+	}
+	else
+		path = *cmd;
+	if (!chdir(path))
+	{
+		pwd = get_env_node("PWD", e_lst);
+		old_pwd = get_env_node("OLDPWD", e_lst);
+		free(old_pwd->next->content);
+		old_pwd->next->content = ft_strjoin("OLDPWD=", get_env(e_lst, "PWD"));
+		free(pwd->next->content);
+		tmp = getcwd(NULL, 0);
+		pwd->next->content = ft_strjoin("PWD=", tmp);
+		free(tmp);
+	}
+	else
+		put_error_message(1, *cmd);
 }
 
-int	execute_pwd(t_list *e_lst)
+void	execute_pwd(t_list *e_lst)
 {
 	char	*pwd;
 
-	pwd = get_env(e_lst, "PWD");
+	pwd = getcwd(NULL, 0);
 	if (pwd != NULL)
 		printf("%s\n", pwd);
-	else
-		return (-1);
-	exit(0);
+	free(pwd);
 }
 
 void	execute_exit(t_token *token)

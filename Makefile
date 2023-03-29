@@ -3,15 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: siyang <siyang@student.42.fr>              +#+  +:+       +#+         #
+#    By: danpark <danpark@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 18:47:25 by danpark           #+#    #+#              #
-#    Updated: 2023/03/28 14:48:52 by siyang           ###   ########.fr        #
+#    Updated: 2023/03/29 18:12:54 by danpark          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS_M = minishell.c minishell_utils.c parser.c get_txt.c error_handler.c \
-		 execute.c execute_utils.c check_builtin.c builtins.c builtins_env.c
+		 execute.c execute_utils.c check_builtin.c builtins.c builtins_env.c\
+		 check_syntax_error.c
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f

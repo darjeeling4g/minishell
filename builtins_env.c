@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_env.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 01:26:19 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 19:33:31 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	execute_env(t_list *e_lst)
+void	execute_env(t_list *e_lst)
 {
 	char *env;
 
@@ -23,18 +23,18 @@ int	execute_env(t_list *e_lst)
 			printf("%s\n", env);
 		e_lst = e_lst->next;
 	}
-	return (0);
 }
 
-int	execute_export(char	**cmd, t_list *e_lst)
+void	execute_export(char	**cmd, t_list *e_lst)
 {
 	t_list	*new;
 	t_list	*tmp;
 	char	**env;
+	char	*str;
 
 	cmd++;
 	if (!*cmd)
-		print_sorted_envp(e_lst);
+		sort_n_print(e_lst);
 	else
 	{
 		while (*cmd)
@@ -43,28 +43,32 @@ int	execute_export(char	**cmd, t_list *e_lst)
 			if (!is_valid_name(env[0]))
 			{
 				free_array(env, -1);
-				return (1);
+				put_customized_error_message(1, *cmd, "not a valid identifier");
+				return ;
 			}
-			new = ft_lstnew(*cmd);
-			if (!new)
-				return (1);
-			tmp = get_env_node(env[0], e_lst);
 			free_array(env, -1);
+			tmp = get_env_node(env[0], e_lst);
+			str = ft_strdup(*cmd);
+			if (!str)
+				exit(1);
 			if (tmp)
 			{
-				new->next = tmp->next->next;
-				free(tmp->next);
-				tmp->next = new;
+				free(tmp->next->content);
+				tmp->next->content = str;
 			}
 			else
+			{
+				new = ft_lstnew(str);
+				if (!new)
+					exit(1);
 				ft_lstadd_back(&e_lst, new);
+			}
 			cmd++;
 		}
 	}
-	return (0);
 }
 
-int	execute_unset(char **cmd, t_list *e_lst)
+void	execute_unset(char **cmd, t_list *e_lst)
 {
 	t_list	*env;
 	t_list	*tmp;
@@ -73,20 +77,26 @@ int	execute_unset(char **cmd, t_list *e_lst)
 	while (*cmd)
 	{
 		if (!is_valid_name(*cmd))
-			return (-1);
+		{
+			put_customized_error_message(1, *cmd, "not a valid identifier");
+			return ;
+		}
 		env = get_env_node(*cmd, e_lst);
 		if (env)
 		{
-			tmp = env->next;
-			env->next = env->next->next;
-			free(tmp);
+			if (!ft_strncmp(env->content, "_=", 2))
+			{
+				tmp = env->next;
+				env->next = env->next->next;
+				free(tmp->content);
+				free(tmp);
+			}
 		}
 		cmd++;
 	}
-	return (0);
 }
 
-void	print_sorted_envp(t_list *e_lst)
+void	sort_n_print(t_list *e_lst)
 {
 	char	**arr;
 	char	*tmp;
@@ -117,13 +127,30 @@ void	print_sorted_envp(t_list *e_lst)
 			}
 		}
 	}
+	print_sorted_envp(arr);
+	free_array(arr, -1);
+}
+
+void	print_sorted_envp(char **arr)
+{
+	int		i;
+	char	*equal;
+
 	i = -1;
 	while (arr[++i])
 	{
 		if (ft_strncmp("_=", arr[i], 2))
-			printf("declare -x %s\n", arr[i]);
+		{
+			equal = ft_strchr(arr[i], '=');
+			if (equal)
+			{
+				*equal = '\0';
+				printf("declare -x %s=\"%s\"\n", arr[i], equal + 1);
+			}
+			else
+				printf("declare -x %s\n", arr[i]);
+		}
 	}
-	free_array(arr, -1);
 }
 
 t_list	*get_env_node(char *name, t_list *e_lst)

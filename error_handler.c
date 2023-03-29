@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error_handler.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 14:38:13 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 15:53:59 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 20:23:03 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,26 @@ void	free_array(char **arr, int idx)
 		while (++i < idx)
 			free(arr[i]);
 	free(arr);
+}
+
+void	free_token_list(t_list *tokens)
+{
+	t_list	*head;
+	t_token	*token;
+
+	head = tokens;
+	while (tokens)
+	{
+		token = (t_token *)(tokens->content);
+		ft_lstclear(&token->rd, delete_list_content);
+		ft_lstclear(&token->txt, delete_list_content);
+		tokens = tokens->next;
+	}
+	ft_lstclear(&head, delete_list_content);
+}
+
+void	delete_list_content(void *content)
+{
+	if (content)
+		free (content);
 }

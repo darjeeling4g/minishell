@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 01:09:27 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/29 20:14:42 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,38 @@
 
 t_list	*tokenizer(char *input, t_list *e_lst)
 {
-	t_list	*res;
+	t_list	*tokens;
 	t_list	*new;
 	t_token	*token;
 
 	token = init_token();
-	res = NULL;
+	tokens = NULL;
 	while (*input)
 	{
 		while (*input == ' ')
 			input++;
 		if (*input == '<' || *input == '>')
-			add_redirection_struct(token, &input, e_lst);
+		{
+			if (add_redirection_struct(token, &input, e_lst) < 0)
+			{
+				free(token);
+				free_token_list(tokens);
+				return (NULL);
+			}
+		}
 		else if (*input != '|')
 			add_text_struct(token, &input, e_lst);
 		else if (*input == '|')
 		{
 			new = ft_lstnew(token);
-			ft_lstadd_back(&res, new);
+			ft_lstadd_back(&tokens, new);
 			token = init_token();
 			input++;
 		}
 	}
 	new = ft_lstnew(token);
-	ft_lstadd_back(&res, new);
-	return (res);
+	ft_lstadd_back(&tokens, new);
+	return (tokens);
 }
 
 t_token	*init_token(void)
@@ -66,11 +73,18 @@ void	add_text_struct(t_token *token, char **input, t_list *e_lst)
 	}
 }
 
-void	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
+int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 {
 	t_list	*new;
 	t_rd	*rd;
+	int		rd_cnt;
 
+	rd_cnt = count_contained_redirection(*input);
+	if (rd_cnt > 2)
+	{
+		put_redirection_syntax_error_message((*input)+=rd_cnt);
+		return (-1);
+	}
 	rd = (t_rd *)malloc(sizeof(t_rd) * 1);
 	if (!rd)
 		exit(1);
@@ -96,37 +110,14 @@ void	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 		else
 			rd->type = OUT;
 	}
-	if (**input == '<' || **input == '>')
-		handle_redirection_error(input);
-	rd->file = get_txt(input, e_lst);
+	if (is_valid_redirection_token_syntax(*input))
+		rd->file = get_txt(input, e_lst);
+	else
+	{
+		free(rd);
+		return (-1);
+	}
 	new = ft_lstnew(rd);
 	ft_lstadd_back(&(token->rd), new);
-}
-
-void	handle_redirection_error(char **input)
-{
-	int	print_cnt;
-
-	// if (!filename)
-	// {
-	// 	put_customized_error_message(2, 0, "syntax error near unexpected token `newline'");
-	// 	return (0);
-	// }
-	print_cnt = 1;
-	if (**input == '<')
-	{
-		printf("syntax error near unexpected token '<");
-		(*input)++;
-		while (**input == '<' && print_cnt++ < 2)
-			printf("<");
-		printf("'\n");
-	}
-	else if (**input == '>')
-	{
-		printf("syntax error near unexpected token '>");
-		(*input)++;
-		while (**input == '>' && print_cnt++ < 2)
-			printf(">");
-		printf("'\n");
-	}
+	return (0);
 }
