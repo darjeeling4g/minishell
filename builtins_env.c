@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:10:18 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 06:08:42 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 06:32:25 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void	execute_unset(char **cmd, t_list *e_lst)
 		env = get_env_node(*cmd, e_lst);
 		if (env)
 		{
-			if (ft_strncmp(env->content, "_=", 2))
+			if (ft_strncmp(*cmd, "_", ft_strlen(*cmd)))
 			{
 				tmp = env->next;
 				env->next = env->next->next;
