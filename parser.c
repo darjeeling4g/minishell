@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 20:14:42 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 03:43:48 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,14 @@ int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 {
 	t_list	*new;
 	t_rd	*rd;
-	int		rd_cnt;
+//	int		rd_cnt;
 
-	rd_cnt = count_contained_redirection(*input);
-	if (rd_cnt > 2)
-	{
-		put_redirection_syntax_error_message((*input)+=rd_cnt);
-		return (-1);
-	}
+//	rd_cnt = count_contained_redirection(*input);
+//	if (rd_cnt > 2)
+//	{
+//		put_redirection_syntax_error_message((*input)+=rd_cnt);
+//		return (-1);
+//	}
 	rd = (t_rd *)malloc(sizeof(t_rd) * 1);
 	if (!rd)
 		exit(1);
@@ -99,7 +99,7 @@ int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 		else
 			rd->type = IN;
 	}
-	if (**input == '>')
+	else if (**input == '>')
 	{
 		(*input)++;
 		if (**input == '>')
@@ -110,7 +110,8 @@ int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 		else
 			rd->type = OUT;
 	}
-	if (is_valid_redirection_token_syntax(*input))
+//	if (is_valid_redirection_token_syntax(*input))
+	if (is_valid_filename(*input))
 		rd->file = get_txt(input, e_lst);
 	else
 	{
