@@ -6,7 +6,7 @@
 #    By: danpark <danpark@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 18:47:25 by danpark           #+#    #+#              #
-#    Updated: 2023/03/29 18:12:54 by danpark          ###   ########.fr        #
+#    Updated: 2023/03/29 22:47:11 by siyang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ $(NAME) : $(OBJS_M)
 	make bonus -C libft
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
-clean : 
+clean :
 	$(MAKE) fclean -C libft
 	$(RM) $(OBJS_M)
 

@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 20:19:04 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/29 22:44:47 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ int is_valid_name(char *name);
 // builtins.c
 void	execute_echo(char **cmd);
 void	execute_cd(char **cmd, t_list *e_lst);
-void	execute_pwd(t_list *e_lst);
+void	execute_pwd(void);
 void	execute_exit(t_token *token);
 
 // builtins_env.c
@@ -128,5 +128,6 @@ t_list *get_env_node(char *name, t_list *e_lst);
 int		count_contained_redirection(char *str);
 int		is_valid_redirection_token_syntax(char *str);
 void	put_redirection_syntax_error_message(char *str);
+char	*get_syntax_error_message(char *str);
 
 #endif

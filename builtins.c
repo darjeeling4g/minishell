@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:06:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 21:17:03 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/29 23:01:57 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,21 @@ void	execute_cd(char **cmd, t_list *e_lst)
 	char	*tmp;
 
 	cmd++;
-	printf("%s\n", *cmd);
 	if (!(*cmd) || !ft_strncmp("~", *cmd, ft_strlen(*cmd)))
 	{
 		path = get_env(e_lst, "HOME");
 		if (!path)
 		{
 			put_customized_error_message(1, *(cmd - 1), "HOME not set");
+			return ;
+		}
+	}
+	else if (!ft_strncmp("-", *cmd, ft_strlen(*cmd)))
+	{
+		path = get_env(e_lst, "OLDPWD");
+		if (!path)
+		{
+			put_customized_error_message(1, *(cmd - 1), "OLDPWD not set");
 			return ;
 		}
 	}
@@ -75,7 +83,7 @@ void	execute_cd(char **cmd, t_list *e_lst)
 		put_error_message(1, *cmd);
 }
 
-void	execute_pwd(t_list *e_lst)
+void	execute_pwd(void)
 {
 	char	*pwd;
 
