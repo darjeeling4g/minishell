@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:06:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 05:11:16 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 05:38:32 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,12 +72,18 @@ void	execute_cd(char **cmd, t_list *e_lst)
 	{
 		pwd = get_env_node("PWD", e_lst);
 		old_pwd = get_env_node("OLDPWD", e_lst);
-		free(old_pwd->next->content);
-		old_pwd->next->content = ft_strjoin("OLDPWD=", get_env(e_lst, "PWD"));
-		free(pwd->next->content);
-		tmp = getcwd(NULL, 0);
-		pwd->next->content = ft_strjoin("PWD=", tmp);
-		free(tmp);
+		if (old_pwd)
+		{
+			free(old_pwd->next->content);
+			old_pwd->next->content = ft_strjoin("OLDPWD=", get_env(e_lst, "PWD"));
+		}
+		if (pwd)
+		{
+			free(pwd->next->content);
+			tmp = getcwd(NULL, 0);
+			pwd->next->content = ft_strjoin("PWD=", tmp);
+			free(tmp);
+		}
 	}
 	else
 		put_error_message(1, *cmd);
