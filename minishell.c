@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 13:56:40 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 23:24:39 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,25 +49,26 @@ void	minishell(t_list *e_lst)
 {
 	t_list	*tokens;
 	char	*input;
-	int		flag;
 
 	input = readline("minishell$ ");
 	while (input != NULL)
 	{
+		tokens = NULL;
 		signal(SIGINT, SIG_IGN);
 		if (*input)
 		{
-			flag = is_complete_command(input);
-			join_input(&input, flag);
+			join_input(&input, is_complete_command(input));
 			tokens = tokenizer(input, e_lst);
 			add_history(input);
-			free(input);
 			if (tokens != NULL)
 				if (check_token_syntax(tokens) == TRUE)
 					interpret_token(tokens, e_lst);
 		}
+		free(input);
 		set_input_mode(PARENT);
 		signal(SIGINT, signal_handler);
+		if (tokens)
+			free_token_list(tokens);
 		input = readline("minishell$ ");
 	}
 }

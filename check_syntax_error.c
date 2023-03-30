@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/29 16:07:41 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 15:36:30 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 21:58:07 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	is_valid_filename(char *input)
 	char	*msg;
 
 	msg = NULL;
-	while (*input == ' ')
+	while (*input == ' ' || *input == '\t')
 		input++;
 	if (*input == '<')
 	{

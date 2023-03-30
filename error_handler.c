@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 14:38:13 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 20:23:03 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 22:39:20 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,16 +61,29 @@ void	free_token_list(t_list *tokens)
 {
 	t_list	*head;
 	t_token	*token;
+	t_list	*rds;
+	t_rd	*rd;
 
 	head = tokens;
 	while (tokens)
 	{
 		token = (t_token *)(tokens->content);
-		ft_lstclear(&token->rd, delete_list_content);
-		ft_lstclear(&token->txt, delete_list_content);
+		rds = token->rd;
+		while (rds)
+		{
+			rd = (t_rd *)rds->content;
+			if (rd->file)
+				free(rd->file);
+			rds = rds->next;
+		}
+		if (token->rd)
+			ft_lstclear(&token->rd, delete_list_content);
+		if (token->txt)
+			ft_lstclear(&token->txt, delete_list_content);
 		tokens = tokens->next;
 	}
-	ft_lstclear(&head, delete_list_content);
+	if (head)
+		ft_lstclear(&head, delete_list_content);
 }
 
 void	delete_list_content(void *content)

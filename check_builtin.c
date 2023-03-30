@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:31:09 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 23:05:40 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void	execute_builtin_command(t_token *token, t_list *e_lst)
 			execute_env(e_lst);
 		else
 			execute_exit(token);
+		free_array(cmd, -1);
 	}
 }
 

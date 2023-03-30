@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:42:03 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 22:43:20 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_list	*tokenizer(char *input, t_list *e_lst)
 	tokens = NULL;
 	while (*input)
 	{
-		while (*input == ' ')
+		while (*input == ' ' || *input == '\t')
 			input++;
 		if (add_token_content(&input, e_lst, tokens, token) == FAIL)
 			return (NULL);
@@ -36,6 +36,8 @@ t_list	*tokenizer(char *input, t_list *e_lst)
 	}
 	new = ft_lstnew(token);
 	ft_lstadd_back(&tokens, new);
+	if (tokens == NULL)
+		ft_lstdelone(new, delete_list_content);
 	return (tokens);
 }
 
@@ -77,6 +79,7 @@ int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 	rd = (t_rd *)malloc(sizeof(t_rd) * 1);
 	if (!rd)
 		exit(1);
+	rd->read = -1;
 	add_rd_type(rd, input);
 	if (is_valid_filename(*input))
 		rd->file = get_txt(input, e_lst);

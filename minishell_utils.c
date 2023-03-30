@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 18:10:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 13:47:59 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 19:49:34 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ char	**list_to_array(t_list *lst)
 	size = ft_lstsize(lst);
 	if (!size)
 		return (NULL);
-	res = malloc(sizeof(char *) * size + 1);
+	res = malloc(sizeof(char *) * (size + 1));
 	res[size] = NULL;
 	i = 0;
 	while (i < size)

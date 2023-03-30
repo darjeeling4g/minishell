@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:43:41 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 23:27:51 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ char	*get_expanded_env(char **input, int *i, t_list *e_lst, int plain);
 char	*get_changed_double_quote(char **input, int quote, char *txt, \
 t_list *e_lst);
 char	*get_changed_single_quote(char **input, int quote, char *txt);
-char	*get_changed_string(char **input, char *txt, t_list *e_lst);
+char	*get_changed_string(char **input, char *txt, t_list *e_lst, int start);
 
 // error_handler.c
 int		put_error_message(unsigned char code, char *cmd);
@@ -120,9 +120,10 @@ int		is_vaild_file(char *filename);
 void	change_stream(t_list *tokens, int (*fds)[2], int first);
 
 // here_doc.c
-void	creat_here_doc_pipe(t_list *rds);
+int		creat_here_doc_fd(t_list *rds);
 char	*get_here_doc_input(t_rd *rd);
-void	close_here_doc_pipe(t_list *rds);
+void	close_here_doc_fd(t_list *rds);
+int		handle_here_doc_process(pid_t pid, int *fds, t_rd *rd);
 
 // redirection.c
 int		redirection(t_list *rds);
