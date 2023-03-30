@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:29:56 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 19:42:03 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,18 +54,6 @@ t_token *token)
 	else if (**input != '|')
 		add_text_struct(token, input, e_lst);
 	return (0);
-}
-
-t_token	*init_token(void)
-{
-	t_token	*token;
-
-	token = (t_token *)malloc(sizeof(t_token) * 1);
-	if (!token)
-		exit(1);
-	token->rd = 0;
-	token->txt = 0;
-	return (token);
 }
 
 void	add_text_struct(t_token *token, char **input, t_list *e_lst)

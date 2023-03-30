@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:35:33 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 19:43:41 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,13 +82,14 @@ int		is_complete_command(char *input);
 
 // parser.c
 t_list	*tokenizer(char *input, t_list *e_lst);
-t_token	*init_token(void);
 void	add_text_struct(t_token *token, char **input, t_list *e_lst);
 int		add_redirection_struct(t_token *token, char **input, t_list *e_lst);
-void	handle_redirection_error(char **input);
 int		add_token_content(char **input, t_list *e_lst, t_list *tokens, \
 t_token *token);
 void	add_rd_type(t_rd *rd, char **input);
+
+// parser_utils.c
+t_token	*init_token(void);
 
 // get_txt.c
 char	*get_txt(char **input, t_list *e_lst);
