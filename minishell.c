@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 14:49:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 06:03:59 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 13:56:40 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 unsigned char	g_exit_code = 0;
 
-void set_input_mode(int flag)
+void	set_input_mode(int flag)
 {
 	struct termios	termattr;
 
@@ -26,33 +26,31 @@ void set_input_mode(int flag)
 	tcsetattr(STDOUT_FILENO, TCSANOW, &termattr);
 }
 
-void signal_handler(int sig)
+void	set_initial_minishell(int argc, char **argv)
 {
-	g_exit_code = 1;
-	if (sig == SIGINT)
-	{
-		printf("\n");
-		rl_on_new_line();
-		rl_replace_line("", 1);
-		rl_redisplay();
-	}
-}
-
-int main(int argc, char **argv, char **envp)
-{
-	t_list			*tokens;
-	t_list			*e_lst;
-	char			*input;
-	int				flag;
-
 	set_input_mode(PARENT);
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
 	(void)argc;
 	(void)argv;
+}
+
+t_list	*get_environment_list(char **envp)
+{
+	t_list	*e_lst;
+
 	e_lst = array_to_list(envp);
 	if (!get_env_node("OLDPWD", e_lst))
 		ft_lstadd_back(&e_lst, ft_lstnew(ft_strdup("OLDPWD")));
+	return (e_lst);
+}
+
+void	minishell(t_list *e_lst)
+{
+	t_list	*tokens;
+	char	*input;
+	int		flag;
+
 	input = readline("minishell$ ");
 	while (input != NULL)
 	{
@@ -72,47 +70,14 @@ int main(int argc, char **argv, char **envp)
 		signal(SIGINT, signal_handler);
 		input = readline("minishell$ ");
 	}
-	return (0);
 }
 
-
-void join_input(char **input, int flag)
+int	main(int argc, char **argv, char **envp)
 {
-	char *tmp;
-	char *add_input;
+	t_list	*e_lst;
 
-	while (flag != 1)
-	{
-		rl_on_new_line();
-		add_input = readline("> ");
-		tmp = *input;
-		*input = ft_strjoin(*input, "\n");
-		free(tmp);
-		tmp = *input;
-		*input = ft_strjoin(*input, add_input);
-		flag = is_complete_command(*input);
-		free(tmp);
-		free(add_input);
-	}
-}
-
-int is_complete_command(char *input)
-{
-	int i;
-	int flag;
-
-	i = -1;
-	flag = 1;
-	while (input[++i])
-	{
-		if (input[i] == DQ && flag == 1)
-			flag = DQ;
-		else if (input[i] == SQ && flag == 1)
-			flag = SQ;
-		else if (input[i] == DQ && flag == DQ)
-			flag = 1;
-		else if (input[i] == SQ && flag == SQ)
-			flag = 1;
-	}
-	return (flag);
+	set_initial_minishell(argc, argv);
+	e_lst = get_environment_list(envp);
+	minishell(e_lst);
+	exit(0);
 }

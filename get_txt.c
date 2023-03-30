@@ -6,44 +6,31 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 12:44:24 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/29 18:08:14 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/30 14:31:35 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//get_txt will return one string argument
 char	*get_txt(char **input, t_list *e_lst)
 {
 	char	*txt;
-	int		quote[3];
 
-	ft_bzero(quote, 3);
-	txt = 0;
+	txt = NULL;
 	while (**input)
 	{
 		if (**input == DQ)
-		{
-			quote[F_DQ] = UNCLOSED;
-			txt = get_changed_double_quote(input, quote, txt, e_lst);
-		}
+			txt = get_changed_double_quote(input, UNCLOSED, txt, e_lst);
 		else if (**input == SQ)
-		{
-			quote[F_SQ] = UNCLOSED;
-			txt = get_changed_single_quote(input, quote, txt);
-		}
+			txt = get_changed_single_quote(input, UNCLOSED, txt);
 		else
-		{
-			quote[F_LT] = 1;
 			txt = get_changed_string(input, txt, e_lst);
-		}
 		if (**input == ' ' || **input == '|')
 			break ;
 	}
 	return (txt);
 }
 
-//get_expanded_env will expand environment and return it
 char	*get_expanded_env(char **input, int *i, t_list *e_lst, int plain)
 {
 	int		start;
@@ -72,38 +59,37 @@ char	*get_expanded_env(char **input, int *i, t_list *e_lst, int plain)
 	return (env);
 }
 
-//this function will change and return only literal in double quotation, and increase input pointer
-char	*get_changed_double_quote(char **input, int *quote, char *txt, t_list *e_lst)
+char	*get_changed_double_quote(char **input, int quote, char *txt, \
+t_list *e_lst)
 {
 	int		i;
 	int		start;
-	char	*env;//expanded env
+	char	*env;
 
 	i = 0;
-	(*input)++;//start after "
+	(*input)++;
 	start = i;
-	while (quote[F_DQ] == UNCLOSED)//it will recur until quotation open
+	while (quote == UNCLOSED)
 	{
-		if ((*input)[i] == DQ)//if double quotation appear, it will closed and recursion is finished.
-			quote[F_DQ] = CLOSED;
-		if ((*input)[i] == '$')//if '$' sign appear, it will expand.
+		if ((*input)[i] == DQ)
+			quote = CLOSED;
+		if ((*input)[i] == '$')
 		{
-			if (i - start > 0)//previous characters are newly assigned.
-				txt = ft_substrjoin(txt, *input, start, i - start);//txt will free in ft_substrjoin.
-			env = get_expanded_env(input, &i, e_lst, 0);//index increase as length of environment name.
+			if (i - start > 0)
+				txt = ft_substrjoin(txt, *input, start, i - start);
+			env = get_expanded_env(input, &i, e_lst, 0);
 			txt = ft_substrjoin(txt, env, 0, ft_strlen_md(env));
-			start = i + 1;//updates the index after the environment name.
+			start = i + 1;
 		}
 		i++;
 	}
-	if (start != i)//if there are no environs or string remain after envivorn, add string to txt. 
+	if (start != i)
 		txt = ft_substrjoin(txt, *input, start, i - start - 1);
-	(*input) += i;//increase input pointer after double quotation.
+	(*input) += i;
 	return (txt);
 }
 
-//this function will change and return only literal in single quotation
-char	*get_changed_single_quote(char **input, int *quote, char *txt)
+char	*get_changed_single_quote(char **input, int quote, char *txt)
 {
 	int		i;
 	int		start;
@@ -111,44 +97,43 @@ char	*get_changed_single_quote(char **input, int *quote, char *txt)
 	i = 0;
 	(*input)++;
 	start = i;
-	while (quote[F_SQ] == UNCLOSED)//it will recur until quotation open
+	while (quote == UNCLOSED)
 	{
-		if ((*input)[i] == SQ)//if double quotation appear, it will closed and recursion is finished.
-			quote[F_SQ] = CLOSED;
+		if ((*input)[i] == SQ)
+			quote = CLOSED;
 		i++;
 	}
-	if (start != i)//if there are no environs or string remain after envivorn, add string to txt. 
+	if (start != i)
 		txt = ft_substrjoin(txt, *input, start, i - start - 1);
-	(*input) += i;//increase input pointer after single quotation.
+	(*input) += i;
 	return (txt);
 }
 
-//this function will change and return literal to space character
 char	*get_changed_string(char **input, char *txt, t_list *e_lst)
 {
 	int		i;
 	int		start;
-	char	*env;//expanded env
+	char	*env;
 
 	i = 0;
 	start = i;
 	while (**input == ' ')
 		(*input)++;
 	while ((*input)[i] != ' ' && (*input)[i] != '\0' && (*input)[i] != '|' && \
-	(*input)[i] != DQ && (*input)[i] != SQ)//it will recur to end of string.
+	(*input)[i] != DQ && (*input)[i] != SQ)
 	{
-		if ((*input)[i] == '$')//if '$' sign appear, env will be expanded.
+		if ((*input)[i] == '$')
 		{
-			if (i - start > 0)//previous characters are newly assigned.
-				txt = ft_substrjoin(txt, *input, start, i - start);//txt will free in ft_substrjoin.
+			if (i - start > 0)
+				txt = ft_substrjoin(txt, *input, start, i - start);
 			env = get_expanded_env(input, &i, e_lst, 1);
 			txt = ft_substrjoin(txt, env, 0, ft_strlen_md(env));
-			start = i + 1;//updates the index after the environment name.
+			start = i + 1;
 		}
 		i++;
 	}
-	if (start != i)//if there are no environs or string remain after envivorn, add string to txt. 
+	if (start != i)
 		txt = ft_substrjoin(txt, *input, start, i - start);
-	(*input) += i;//increase input pointer.
+	(*input) += i;
 	return (txt);
 }

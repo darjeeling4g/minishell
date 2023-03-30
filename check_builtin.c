@@ -3,42 +3,52 @@
 /*                                                        :::      ::::::::   */
 /*   check_builtin.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 13:24:32 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 02:44:14 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 19:31:09 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int is_builtin(t_list *cmdlst)
+int	is_builtin(t_list *cmdlst)
 {
-	size_t cmdlen;
-	char *cmd;
+	size_t	cmdlen;
+	char	*cmd;
 
 	cmd = (char *)cmdlst->content;
 	cmdlen = ft_strlen(cmd);
-	if ((ft_strlen("echo") == cmdlen && !ft_strncmp("echo", cmd, cmdlen)) ||
-		(ft_strlen("cd") == cmdlen && !ft_strncmp("cd", cmd, cmdlen)) ||
-		(ft_strlen("pwd") == cmdlen && !ft_strncmp("pwd", cmd, cmdlen)) ||
-		(ft_strlen("export") == cmdlen && !ft_strncmp("export", cmd, cmdlen)) ||
-		(ft_strlen("unset") == cmdlen && !ft_strncmp("unset", cmd, cmdlen)) ||
-		(ft_strlen("env") == cmdlen && !ft_strncmp("env", cmd, cmdlen)) ||
-		(ft_strlen("exit") == cmdlen && !ft_strncmp("exit", cmd, cmdlen)))
+	if ((ft_strlen("echo") == cmdlen && !ft_strncmp("echo", cmd, cmdlen))
+		|| (ft_strlen("cd") == cmdlen && !ft_strncmp("cd", cmd, cmdlen))
+		|| (ft_strlen("pwd") == cmdlen && !ft_strncmp("pwd", cmd, cmdlen))
+		|| (ft_strlen("export") == cmdlen && !ft_strncmp("export", cmd, cmdlen))
+		|| (ft_strlen("unset") == cmdlen && !ft_strncmp("unset", cmd, cmdlen))
+		|| (ft_strlen("env") == cmdlen && !ft_strncmp("env", cmd, cmdlen))
+		|| (ft_strlen("exit") == cmdlen && !ft_strncmp("exit", cmd, cmdlen)))
 		return (1);
 	return (0);
 }
 
-void execute_builtin_command(t_token *token, t_list *e_lst, int parent)
+void	parent_execute_command(t_token *token, t_list *e_lst)
 {
-	char	**cmd;
-	int		cmdlen;
 	int		std[2];
 
 	std[0] = dup(STDIN_FILENO);
 	std[1] = dup(STDOUT_FILENO);
-	if (!redirection(token->rd))
+	execute_builtin_command(token, e_lst);
+	dup2(std[0], STDIN_FILENO);
+	dup2(std[1], STDOUT_FILENO);
+	close(std[0]);
+	close(std[1]);
+}
+
+void	execute_builtin_command(t_token *token, t_list *e_lst)
+{
+	char	**cmd;
+	int		cmdlen;
+
+	if (redirection(token->rd) == SUCCESS)
 	{
 		cmd = list_to_array(token->txt);
 		cmdlen = ft_strlen(*cmd);
@@ -57,17 +67,11 @@ void execute_builtin_command(t_token *token, t_list *e_lst, int parent)
 		else
 			execute_exit(token);
 	}
-	dup2(std[0], STDIN_FILENO);
-	dup2(std[1], STDOUT_FILENO);
-	close(std[0]);
-	close(std[1]);
-	if (!parent)
-		exit((int)g_exit_code);
 }
-//added checking under bar
-int is_valid_name(char *name)
+
+int	is_valid_name(char *name)
 {
-	int res;
+	int	res;
 
 	res = 1;
 	if ((ft_isalpha(*name) || *name == '_') == FALSE)

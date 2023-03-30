@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 06:45:17 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 15:25:01 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,109 +27,19 @@ int	is_vaild_file(char *filename)
 	return (1);
 }
 
-int	redirection(t_list *rds)
+char	*get_env(t_list *e_lst, const char *name)
 {
-	t_rd *rd;
-	int file;
-
-	while (rds)
-	{
-		rd = (t_rd *)rds->content;
-		if (rd->type == IN)
-		{
-			if (is_vaild_file(rd->file) == FALSE)
-				return (-1);
-			file = open(rd->file, O_RDONLY);
-			if (file == -1)
-				return (put_error_message(1, 0));
-			dup2(file, STDIN_FILENO);
-			close(file);
-		}
-		else if (rd->type == HRDC)
-		{
-			dup2(rd->read, STDIN_FILENO);
-			close(rd->read);
-		}
-		else
-		{
-			if (rd->type == OUT)
-				file = open(rd->file, O_CREAT | O_TRUNC | O_WRONLY, 0644);
-			else if (rd->type == APND)
-				file = open(rd->file, O_CREAT | O_APPEND | O_WRONLY, 0644);
-			if (file == -1)
-				return (put_error_message(1, 0));
-			dup2(file, STDOUT_FILENO);
-			close(file);
-		}
-		rds = rds->next;
-	}
-	return (0);
-}
-
-void get_here_doc_input(t_list *rds)
-{
-	char	*input;
-	char	*rd_line;
-	size_t	rd_len;
-	size_t	lmt_len;
-	int		fds[2];
-	t_rd	*rd;
-
-	while (rds)
-	{
-		rd = (t_rd *)rds->content;
-		if (rd->type == HRDC)
-		{
-			if (pipe(fds) == -1)
-				exit(1);
-			input = ft_strdup("");
-			lmt_len = ft_strlen(rd->file);
-			while (1)
-			{
-				write(1, "> ", 3);
-				rd_line = get_next_line(0);
-				if (!rd_line)
-					break;
-				rd_len = ft_strlen(rd_line) - 1;
-				if (lmt_len == rd_len && ft_strncmp(rd->file, rd_line, rd_len) == 0)
-					break;
-				input = ft_substrjoin(input, rd_line, 0, ft_strlen(rd_line));
-				free(rd_line);
-			}
-			write(fds[1], input, ft_strlen(input));
-			close(fds[1]);
-			free(input);
-			rd->read = fds[0];
-		}
-		rds = rds->next;
-	}
-}
-
-void	close_here_doc_pipe(t_list *rds)
-{
-	t_rd	*rd;
-
-	while(rds)
-	{
-		rd = (t_rd *)rds->content;
-		if (rd->type == HRDC)
-			close(rd->read);
-		rds = rds->next;
-	}
-}
-
-char *get_env(t_list *e_lst, const char *name)
-{
-	char *str;
-	size_t size;
+	char	*str;
+	size_t	size;
 
 	while (e_lst)
 	{
 		str = (char *)e_lst->content;
-		size = -1;
-		while (str[++size] != '=');
+		size = 0;
+		while (str[size] != '=')
+			size++;
 		if (size == ft_strlen(name) && !ft_strncmp(str, name, size))
-			break;
+			break ;
 		e_lst = e_lst->next;
 	}
 	if (e_lst == NULL)
@@ -138,12 +48,12 @@ char *get_env(t_list *e_lst, const char *name)
 	return (str);
 }
 
-char *find_bin(char *arg, char **envp)
+char	*find_bin(char *arg, char **envp)
 {
-	int i;
-	char **path_group;
-	char *path;
-	char *temp;
+	int		i;
+	char	**path_group;
+	char	*path;
+	char	*temp;
 
 	while (ft_strnstr(*envp, "PATH", 4) == 0)
 		envp++;

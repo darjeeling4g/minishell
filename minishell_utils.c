@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 18:10:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/28 14:59:23 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 13:47:59 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,4 +66,45 @@ t_list	*array_to_list(char **arr)
 		arr++;
 	}
 	return (res);
+}
+
+void	join_input(char **input, int flag)
+{
+	char	*tmp;
+	char	*add_input;
+
+	while (flag != 1)
+	{
+		rl_on_new_line();
+		add_input = readline("> ");
+		tmp = *input;
+		*input = ft_strjoin(*input, "\n");
+		free(tmp);
+		tmp = *input;
+		*input = ft_strjoin(*input, add_input);
+		flag = is_complete_command(*input);
+		free(tmp);
+		free(add_input);
+	}
+}
+
+int	is_complete_command(char *input)
+{
+	int	i;
+	int	flag;
+
+	i = -1;
+	flag = 1;
+	while (input[++i])
+	{
+		if (input[i] == DQ && flag == 1)
+			flag = DQ;
+		else if (input[i] == SQ && flag == 1)
+			flag = SQ;
+		else if (input[i] == DQ && flag == DQ)
+			flag = 1;
+		else if (input[i] == SQ && flag == SQ)
+			flag = 1;
+	}
+	return (flag);
 }

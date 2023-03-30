@@ -3,25 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: siyang <siyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 06:49:18 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 19:30:14 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void interpret_token(t_list *tokens, t_list *e_lst)
+void	interpret_token(t_list *tokens, t_list *e_lst)
 {
-	pid_t pid;
-	int fds[2][2];
-	t_token *token;
+	pid_t	pid;
+	int		fds[2][2];
+	t_token	*token;
 
 	token = (t_token *)tokens->content;
-	get_here_doc_input(token->rd);
+	creat_here_doc_pipe(token->rd);
 	if (token->txt && ft_lstsize(tokens) == 1 && is_builtin(token->txt))
-		execute_builtin_command(token, e_lst, PARENT);
+		parent_execute_command(token, e_lst);
 	else
 	{
 		if (pipe(fds[0]) == -1)
@@ -39,10 +39,8 @@ void interpret_token(t_list *tokens, t_list *e_lst)
 	}
 }
 
-void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
+void	parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 {
-	int		stat;
-	char	sig_code;
 	t_list	*tmp;
 	t_token	*token;
 
@@ -54,7 +52,7 @@ void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 		if (pipe(fds[1]) == -1)
 			exit(1);
 		token = (t_token *)tokens->content;
-		get_here_doc_input(token->rd);
+		creat_here_doc_pipe(token->rd);
 		pid = fork();
 		if (pid == -1)
 			exit(1);
@@ -66,29 +64,42 @@ void parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
 		close_here_doc_pipe(token->rd);
 		tokens = tokens->next;
 	}
-	while (tmp)
-	{
-		wait(&stat);
-		tmp = tmp->next;
-	}
-	sig_code = (char)stat;
-	g_exit_code = (char)(sig_code + 128);
-	if (sig_code == 3)
-		printf("Quit: %c\n", sig_code + '0');
-	else if (sig_code == 2)
-		printf("\n");
-	if (!sig_code)
-		g_exit_code = (char)(stat >> 8);
+	set_child_exit_status(tmp);
 }
 
-void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
+void	execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 {
-	t_token *token;
-	char **envp;
-	char **cmd;
-	char *path;
+	t_token	*token;
+	char	**envp;
+	char	**cmd;
+	char	*path;
 
+	token = (t_token *)tokens->content;
 	signal(SIGINT, SIG_DFL);
+	change_stream(tokens, fds, first);
+	cmd = list_to_array(token->txt);
+	if (cmd == NULL)
+		exit(0);
+	envp = list_to_array(e_lst);
+	path = find_bin(cmd[0], envp);
+	set_input_mode(CHILD);
+	signal(SIGQUIT, SIG_DFL);
+	if (is_builtin(token->txt))
+	{
+		execute_builtin_command(token, e_lst);
+		exit(g_exit_code);
+	}
+	else if (execve(path, cmd, envp))
+	{
+		put_customized_error_message(127, cmd[0], "command not found");
+		exit(g_exit_code);
+	}
+}
+
+void	change_stream(t_list *tokens, int (*fds)[2], int first)
+{
+	t_token	*token;
+
 	token = (t_token *)tokens->content;
 	if (first)
 	{
@@ -107,16 +118,4 @@ void execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 	close(fds[0][0]);
 	if (redirection(token->rd) == -1)
 		exit(g_exit_code);
-	cmd = list_to_array(token->txt);
-	if (cmd == NULL)
-		exit(0);
-	envp = list_to_array(e_lst);
-	path = find_bin(cmd[0], envp);
-	set_input_mode(CHILD);
-	signal(SIGQUIT, SIG_DFL);
-	if (execve(path, cmd, envp))
-	{
-		put_customized_error_message(127, cmd[0], "command not found");
-		exit(g_exit_code);
-	}
 }

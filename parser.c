@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 19:58:53 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 03:43:48 by siyang           ###   ########.fr       */
+/*   Updated: 2023/03/30 19:29:56 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,9 @@ t_list	*tokenizer(char *input, t_list *e_lst)
 	{
 		while (*input == ' ')
 			input++;
-		if (*input == '<' || *input == '>')
-		{
-			if (add_redirection_struct(token, &input, e_lst) < 0)
-			{
-				free(token);
-				free_token_list(tokens);
-				return (NULL);
-			}
-		}
-		else if (*input != '|')
-			add_text_struct(token, &input, e_lst);
-		else if (*input == '|')
+		if (add_token_content(&input, e_lst, tokens, token) == FAIL)
+			return (NULL);
+		if (*input == '|')
 		{
 			new = ft_lstnew(token);
 			ft_lstadd_back(&tokens, new);
@@ -46,6 +37,23 @@ t_list	*tokenizer(char *input, t_list *e_lst)
 	new = ft_lstnew(token);
 	ft_lstadd_back(&tokens, new);
 	return (tokens);
+}
+
+int	add_token_content(char **input, t_list *e_lst, t_list *tokens, \
+t_token *token)
+{
+	if (**input == '<' || **input == '>')
+	{
+		if (add_redirection_struct(token, input, e_lst) < 0)
+		{
+			free(token);
+			free_token_list(tokens);
+			return (-1);
+		}
+	}
+	else if (**input != '|')
+		add_text_struct(token, input, e_lst);
+	return (0);
 }
 
 t_token	*init_token(void)
@@ -77,17 +85,25 @@ int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 {
 	t_list	*new;
 	t_rd	*rd;
-//	int		rd_cnt;
 
-//	rd_cnt = count_contained_redirection(*input);
-//	if (rd_cnt > 2)
-//	{
-//		put_redirection_syntax_error_message((*input)+=rd_cnt);
-//		return (-1);
-//	}
 	rd = (t_rd *)malloc(sizeof(t_rd) * 1);
 	if (!rd)
 		exit(1);
+	add_rd_type(rd, input);
+	if (is_valid_filename(*input))
+		rd->file = get_txt(input, e_lst);
+	else
+	{
+		free(rd);
+		return (-1);
+	}
+	new = ft_lstnew(rd);
+	ft_lstadd_back(&(token->rd), new);
+	return (0);
+}
+
+void	add_rd_type(t_rd *rd, char **input)
+{
 	if (**input == '<')
 	{
 		(*input)++;
@@ -110,15 +126,4 @@ int	add_redirection_struct(t_token *token, char **input, t_list *e_lst)
 		else
 			rd->type = OUT;
 	}
-//	if (is_valid_redirection_token_syntax(*input))
-	if (is_valid_filename(*input))
-		rd->file = get_txt(input, e_lst);
-	else
-	{
-		free(rd);
-		return (-1);
-	}
-	new = ft_lstnew(rd);
-	ft_lstadd_back(&(token->rd), new);
-	return (0);
 }

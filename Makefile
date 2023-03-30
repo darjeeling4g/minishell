@@ -6,13 +6,14 @@
 #    By: danpark <danpark@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 18:47:25 by danpark           #+#    #+#              #
-#    Updated: 2023/03/29 22:47:11 by siyang           ###   ########.fr        #
+#    Updated: 2023/03/30 19:04:38 by danpark          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS_M = minishell.c minishell_utils.c parser.c get_txt.c error_handler.c \
-		 execute.c execute_utils.c check_builtin.c builtins.c builtins_env.c\
-		 check_syntax_error.c
+		 execute.c execute_utils.c check_builtin.c check_syntax_error.c \
+		 signal.c here_doc.c redirection.c echo.c cd.c pwd.c exit.c env.c \
+		 export.c unset.c
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
