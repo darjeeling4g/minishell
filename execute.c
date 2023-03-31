@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 21:40:40 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 18:29:25 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	interpret_token(t_list *tokens, t_list *e_lst)
 	t_token	*token;
 
 	token = (t_token *)tokens->content;
-	if (creat_here_doc_fd(token->rd) == FAIL)
+	if (creat_here_doc_fd(token->rd, 0) == FAIL)
 		return (close_here_doc_fd(token->rd));
 	if (token->txt && ft_lstsize(tokens) == 1 && is_builtin(token->txt))
 		parent_execute_command(token, e_lst);
@@ -33,40 +33,49 @@ void	interpret_token(t_list *tokens, t_list *e_lst)
 		else if (pid != 0)
 		{
 			close_here_doc_fd(token->rd);
-			parent_do(tokens, pid, fds, e_lst);
+			parent_do(tokens, fds, e_lst);
 		}
 		else
 			execute_command(tokens, fds, 1, e_lst);
 	}
 }
 
-void	parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst)
+void	parent_do(t_list *tokens, int (*fds)[2], t_list *e_lst)
 {
-	t_list	*tmp;
 	t_token	*token;
+	t_list	*tmp;
+	int		cnt;
 
 	close(fds[0][1]);
 	tmp = tokens;
 	tokens = tokens->next;
+	cnt = 0;
 	while (tokens)
 	{
 		if (pipe(fds[1]) == -1)
 			exit(1);
 		token = (t_token *)tokens->content;
-		if (creat_here_doc_fd(token->rd) == FAIL)
+		if (creat_here_doc_fd(token->rd, ++cnt) == FAIL)
 			return (close_here_doc_fd(token->rd));
-		pid = fork();
-		if (pid == -1)
-			exit(1);
-		else if (pid == 0)
-			execute_command(tokens, fds, 0, e_lst);
-		dup2(fds[1][0], fds[0][0]);
-		close(fds[1][0]);
-		close(fds[1][1]);
+		creat_exe_process(tokens, fds, e_lst);
 		close_here_doc_fd(token->rd);
 		tokens = tokens->next;
 	}
 	set_child_exit_status(tmp);
+}
+
+void	creat_exe_process(t_list *tokens, int (*fds)[2], t_list *e_lst)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == -1)
+		exit(1);
+	else if (pid == 0)
+		execute_command(tokens, fds, 0, e_lst);
+	dup2(fds[1][0], fds[0][0]);
+	close(fds[1][0]);
+	close(fds[1][1]);
 }
 
 void	execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)

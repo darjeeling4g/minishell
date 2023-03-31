@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 12:44:24 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 23:30:54 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 18:18:09 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ t_list *e_lst)
 			start = i + 1;
 		}
 	}
-	if (start != i)
-		txt = ft_substrjoin(txt, *input, start, i - start - 1);
-	(*input) += i;
+	if (start != (i + 1))
+		txt = ft_substrjoin(txt, *input, start, i - start);
+	(*input) += (i + 1);
 	return (txt);
 }
 
@@ -95,12 +95,15 @@ char	*get_changed_single_quote(char **input, int quote, char *txt)
 	int		i;
 	int		start;
 
-	i = -1;
+	i = 0;
 	(*input)++;
 	start = 0;
 	while (quote == UNCLOSED)
-		if ((*input)[++i] == SQ)
+	{
+		if ((*input)[i] == SQ)
 			quote = CLOSED;
+		i++;
+	}
 	if (start != i)
 		txt = ft_substrjoin(txt, *input, start, i - start - 1);
 	(*input) += i;

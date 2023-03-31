@@ -3,20 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 15:24:29 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 21:31:10 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 18:13:45 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	creat_here_doc_fd(t_list *rds)
+int	creat_here_doc_fd(t_list *rds, int cnt)
 {
 	int		fds[2];
 	t_rd	*rd;
 	pid_t	pid;
+	int		stat;
 
 	while (rds)
 	{
@@ -27,7 +28,11 @@ int	creat_here_doc_fd(t_list *rds)
 				exit(1);
 			pid = fork();
 			if (handle_here_doc_process(pid, fds, rd) == FAIL)
+			{
+				while (cnt--)
+					wait(&stat);
 				return (-1);
+			}
 		}
 		rds = rds->next;
 	}
@@ -52,10 +57,11 @@ int	handle_here_doc_process(pid_t pid, int *fds, t_rd *rd)
 	}
 	close(fds[1]);
 	rd->read = fds[0];
-	wait(&stat);
+	waitpid(pid, &stat, 0);
 	sig_code = (char)stat;
 	if (sig_code != 0)
 	{
+		g_exit_code = 1;
 		printf("\n");
 		return (-1);
 	}

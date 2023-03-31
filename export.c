@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 16:07:52 by siyang            #+#    #+#             */
-/*   Updated: 2023/03/30 18:43:39 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 16:53:54 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,18 +48,20 @@ void	update_env_list(char *env, char *cmd, t_list *e_lst)
 	str = ft_strdup(cmd);
 	if (!str)
 		exit(1);
-	if (tmp)
+	if (tmp && ft_strchr(cmd, '='))
 	{
 		free(tmp->next->content);
 		tmp->next->content = str;
 	}
-	else
+	else if (!tmp)
 	{
 		new = ft_lstnew(str);
 		if (!new)
 			exit(1);
 		ft_lstadd_back(&e_lst, new);
 	}
+	else
+		free(str);
 }
 
 void	sort_n_print(t_list *e_lst)

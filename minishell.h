@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 23:27:51 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 18:29:35 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,9 +109,10 @@ void	delete_list_content(void *content);
 
 // execute.c
 void	interpret_token(t_list *tokens, t_list *e_lst);
-void	parent_do(t_list *tokens, pid_t pid, int (*fds)[2], t_list *e_lst);
+void	parent_do(t_list *tokens, int (*fds)[2], t_list *e_lst);
 void	execute_command(t_list *tokens, int (*fds)[2], int first, \
 t_list *e_lst);
+void	creat_exe_process(t_list *tokens, int (*fds)[2], t_list *e_lst);
 
 // execute_utils.c
 char	*get_env(t_list *e_lst, const char *name);
@@ -120,7 +121,7 @@ int		is_vaild_file(char *filename);
 void	change_stream(t_list *tokens, int (*fds)[2], int first);
 
 // here_doc.c
-int		creat_here_doc_fd(t_list *rds);
+int		creat_here_doc_fd(t_list *rds, int cnt);
 char	*get_here_doc_input(t_rd *rd);
 void	close_here_doc_fd(t_list *rds);
 int		handle_here_doc_process(pid_t pid, int *fds, t_rd *rd);
@@ -148,11 +149,13 @@ int		is_exist_filename(t_token *token);
 
 // echo.c
 void	execute_echo(char **cmd);
-int		is_exist_option(char **cmd);
+int		count_exist_option(char **cmd);
 
 // cd.c
 void	execute_cd(char **cmd, t_list *e_lst);
 void	set_pwd(t_list *e_lst, char *path, char **cmd);
+void	change_old_pwd(t_list *old_pwd, char *tmp);
+void	change_pwd(t_list *pwd);
 
 // pwd.c
 void	execute_pwd(void);

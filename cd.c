@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 16:31:06 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:35:34 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 18:27:26 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,9 @@ void	execute_cd(char **cmd, t_list *e_lst)
 		}
 	}
 	else
-		path = *cmd;
+		path = ft_strdup(*cmd);
 	set_pwd(e_lst, path, cmd);
+	free (path);
 }
 
 void	set_pwd(t_list *e_lst, char *path, char **cmd)
@@ -46,25 +47,37 @@ void	set_pwd(t_list *e_lst, char *path, char **cmd)
 	t_list	*pwd;
 	char	*tmp;
 
+	tmp = getcwd(NULL, 0);
 	if (!chdir(path))
 	{
 		pwd = get_env_node("PWD", e_lst);
 		old_pwd = get_env_node("OLDPWD", e_lst);
 		if (old_pwd)
-		{
-			free(old_pwd->next->content);
-			old_pwd->next->content = ft_strjoin("OLDPWD=", \
-			get_env(e_lst, "PWD"));
-		}
+			change_old_pwd(old_pwd, tmp);
+		free(tmp);
 		if (pwd)
-		{
-			free(pwd->next->content);
-			tmp = getcwd(NULL, 0);
-			pwd->next->content = ft_strjoin("PWD=", tmp);
-			free(tmp);
-		}
+			change_pwd(pwd);
 		g_exit_code = 0;
 	}
 	else
+	{
+		free(tmp);
 		put_error_message(1, *cmd);
+	}
+}
+
+void	change_old_pwd(t_list *old_pwd, char *tmp)
+{
+	free(old_pwd->next->content);
+	old_pwd->next->content = ft_strjoin("OLDPWD=", tmp);
+}
+
+void	change_pwd(t_list *pwd)
+{
+	char	*tmp;
+
+	free(pwd->next->content);
+	tmp = getcwd(NULL, 0);
+	pwd->next->content = ft_strjoin("PWD=", tmp);
+	free(tmp);
 }

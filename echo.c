@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 16:03:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 19:07:11 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 17:33:06 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void	execute_echo(char **cmd)
 {
-	int	option;
+	int	cnt;
 
-	cmd++;
-	option = is_exist_option(cmd);
+	cnt = count_exist_option(++cmd);
+	cmd += cnt;
 	while (*cmd)
 	{
 		printf("%s", *cmd);
@@ -25,20 +25,36 @@ void	execute_echo(char **cmd)
 		if (*cmd)
 			printf(" ");
 	}
-	if (option == FALSE)
+	if (cnt == 0)
 		printf("\n");
 	g_exit_code = 0;
 }
 
-int	is_exist_option(char **cmd)
+int	count_exist_option(char **cmd)
 {
-	if (*cmd == NULL)
-		return (FALSE);
-	else if (ft_strlen(*cmd) == ft_strlen("-n") && \
-	ft_strncmp("-n", *cmd, ft_strlen(*cmd)) == 0)
+	int	i;
+	int	cnt;
+
+	i = 0;
+	cnt = 0;
+	if (*cmd != NULL && **cmd == '-')
 	{
-		cmd++;
-		return (TRUE);
+		while ((*cmd)[++i])
+			if ((*cmd)[i] != 'n')
+				return (cnt);
+		cnt++;
 	}
-	return (FALSE);
+	else
+		return (cnt);
+	cmd++;
+	while (**cmd == '-')
+	{
+		i = 0;
+		while ((*cmd)[++i])
+			if ((*cmd)[i] != 'n')
+				return (cnt);
+		cmd++;
+		cnt++;
+	}
+	return (cnt);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: danpark <danpark@student.42.fr>            +#+  +:+       +#+        */
+/*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 21:41:54 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/30 15:25:01 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 14:40:25 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ char	*get_env(t_list *e_lst, const char *name)
 	{
 		str = (char *)e_lst->content;
 		size = 0;
-		while (str[size] != '=')
+		while (str[size] && str[size] != '=')
 			size++;
 		if (size == ft_strlen(name) && !ft_strncmp(str, name, size))
 			break ;
@@ -45,6 +45,9 @@ char	*get_env(t_list *e_lst, const char *name)
 	if (e_lst == NULL)
 		return (NULL);
 	str += (ft_strlen(name) + 1);
+	str = ft_strdup(str);
+	if (!str)
+		exit(1);
 	return (str);
 }
 
