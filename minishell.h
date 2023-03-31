@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:46:30 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/31 18:29:35 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 22:40:19 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 # include <string.h>
 # include <unistd.h>
 # include <sys/errno.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # include <signal.h>
 # include <term.h>
 # include <fcntl.h>
@@ -113,12 +115,17 @@ void	parent_do(t_list *tokens, int (*fds)[2], t_list *e_lst);
 void	execute_command(t_list *tokens, int (*fds)[2], int first, \
 t_list *e_lst);
 void	creat_exe_process(t_list *tokens, int (*fds)[2], t_list *e_lst);
+void	change_stream(t_list *tokens, int (*fds)[2], int first);
 
 // execute_utils.c
 char	*get_env(t_list *e_lst, const char *name);
 char	*find_bin(char *arg, char **envp);
+char	*get_complete_path(char *arg, char *path_group);
 int		is_vaild_file(char *filename);
-void	change_stream(t_list *tokens, int (*fds)[2], int first);
+
+// execute_utils2.c
+int		is_a_directory(char *path);
+void	handle_execute_fail(t_list *e_lst, char *cmd);
 
 // here_doc.c
 int		creat_here_doc_fd(t_list *rds, int cnt);

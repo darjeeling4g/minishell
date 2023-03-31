@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/31 18:29:25 by danpark          ###   ########.fr       */
+/*   Updated: 2023/03/31 22:40:43 by danpark          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,7 @@ void	execute_command(t_list *tokens, int (*fds)[2], int first, t_list *e_lst)
 		exit(g_exit_code);
 	}
 	else if (execve(path, cmd, envp))
-	{
-		put_customized_error_message(127, cmd[0], "command not found");
-		exit(g_exit_code);
-	}
+		handle_execute_fail(e_lst, cmd[0]);
 }
 
 void	change_stream(t_list *tokens, int (*fds)[2], int first)
