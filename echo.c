@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 16:03:46 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/31 17:33:06 by danpark          ###   ########.fr       */
+/*   Updated: 2023/04/02 17:44:27 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	count_exist_option(char **cmd)
 	else
 		return (cnt);
 	cmd++;
-	while (**cmd == '-')
+	while (*cmd != NULL && **cmd == '-')
 	{
 		i = 0;
 		while ((*cmd)[++i])
