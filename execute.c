@@ -6,7 +6,7 @@
 /*   By: danpark <danpark@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/05 19:54:09 by danpark           #+#    #+#             */
-/*   Updated: 2023/03/31 22:40:43 by danpark          ###   ########.fr       */
+/*   Updated: 2023/04/03 00:10:07 by siyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void	parent_do(t_list *tokens, int (*fds)[2], t_list *e_lst)
 		close_here_doc_fd(token->rd);
 		tokens = tokens->next;
 	}
+	close(fds[0][0]);
 	set_child_exit_status(tmp);
 }
 
